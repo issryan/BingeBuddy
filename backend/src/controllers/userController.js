@@ -1,10 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const { authenticateToken } = require('../middleware/authMiddleware');
 const dynamoDb = require('../utils/db');
 
 // Add a friend
-router.post('/add-friend', authenticateToken, async (req, res) => {
+exports.addFriend = async (req, res) => {
     const { friendEmail } = req.body;
     const userEmail = req.user.email;
 
@@ -25,10 +22,10 @@ router.post('/add-friend', authenticateToken, async (req, res) => {
         console.error('Error adding friend:', err.message);
         res.status(500).json({ message: 'Failed to add friend.', error: err.message });
     }
-});
+};
 
 // Get friends
-router.get('/friends', authenticateToken, async (req, res) => {
+exports.getFriends = async (req, res) => {
     const userEmail = req.user.email;
 
     try {
@@ -43,10 +40,10 @@ router.get('/friends', authenticateToken, async (req, res) => {
         console.error('Error fetching friends:', err.message);
         res.status(500).json({ message: 'Failed to fetch friends.', error: err.message });
     }
-});
+};
 
 // Update profile
-router.patch('/update-profile', authenticateToken, async (req, res) => {
+exports.updateProfile = async (req, res) => {
     const { username, email, password } = req.body;
     const userEmail = req.user.email;
 
@@ -61,8 +58,8 @@ router.patch('/update-profile', authenticateToken, async (req, res) => {
         attributeValues[':email'] = email;
     }
     if (password) {
-        updates.push('password = :password');
-        attributeValues[':password'] = password; // Ensure it's hashed
+        updates.push('password = :password'); // Ensure it's hashed
+        attributeValues[':password'] = password;
     }
 
     try {
@@ -80,6 +77,89 @@ router.patch('/update-profile', authenticateToken, async (req, res) => {
         console.error('Error updating profile:', err.message);
         res.status(500).json({ message: 'Failed to update profile.', error: err.message });
     }
-});
+};
 
-module.exports = router;
+// Fetch user profile details
+exports.getProfile = async (req, res) => {
+    try {
+        const { username, email } = req.user;
+
+        // Count watchlist items
+        const watchlistParams = {
+            TableName: process.env.WATCHLIST_TABLE,
+            KeyConditionExpression: 'email = :email',
+            ExpressionAttributeValues: { ':email': email },
+        };
+
+        const watchlistResponse = await dynamoDb.query(watchlistParams).promise();
+        const watchlistCount = watchlistResponse.Items.length;
+
+        // Count followers and following
+        const followersParams = {
+            TableName: process.env.FOLLOWERS_TABLE,
+            KeyConditionExpression: 'followedEmail = :email',
+            ExpressionAttributeValues: { ':email': email },
+        };
+
+        const followersResponse = await dynamoDb.query(followersParams).promise();
+        const followersCount = followersResponse.Items.length;
+
+        const followingParams = {
+            TableName: process.env.FOLLOWERS_TABLE,
+            KeyConditionExpression: 'followerEmail = :email',
+            ExpressionAttributeValues: { ':email': email },
+        };
+
+        const followingResponse = await dynamoDb.query(followingParams).promise();
+        const followingCount = followingResponse.Items.length;
+
+        res.status(200).json({
+            username,
+            email,
+            watchlistCount,
+            followersCount,
+            followingCount,
+        });
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        res.status(500).json({ message: 'Error fetching profile' });
+    }
+};
+
+// Fetch available users to follow
+exports.getAvailableUsers = async (req, res) => {
+    try {
+        const { email } = req.user;
+
+        const params = {
+            TableName: process.env.USERS_TABLE,
+            FilterExpression: 'email <> :email', // Exclude current user
+            ExpressionAttributeValues: { ':email': email },
+        };
+
+        const response = await dynamoDb.scan(params).promise();
+        res.status(200).json(response.Items);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ message: 'Error fetching users' });
+    }
+};
+
+// Follow a user
+exports.followUser = async (req, res) => {
+    const { followedEmail } = req.body;
+    const { email: followerEmail } = req.user;
+
+    try {
+        const params = {
+            TableName: process.env.FOLLOWERS_TABLE,
+            Item: { followerEmail, followedEmail },
+        };
+
+        await dynamoDb.put(params).promise();
+        res.status(200).json({ message: `You are now following ${followedEmail}` });
+    } catch (error) {
+        console.error('Error following user:', error);
+        res.status(500).json({ message: 'Error following user' });
+    }
+};

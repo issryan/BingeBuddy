@@ -7,6 +7,7 @@ import ShowDetails from './components/ShowDetails';
 import Register from './components/Register';
 import Home from './components/Home';
 import Navbar from './components/Navbar';
+import Profile from './components/Profile';
 
 const App = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -27,6 +28,7 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/search" element={<Search searchQuery={searchQuery} />} />
                 <Route path="/watchlist" element={<Watchlist />} />
                 <Route path="/show/:id" element={<ShowDetails />} />
