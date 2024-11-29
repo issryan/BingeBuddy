@@ -1,4 +1,6 @@
-const dynamoDb = require('../utils/db');
+const UserRepository = require('../repositories/userRepository');
+const WatchlistRepository = require('../repositories/watchlistRepository');
+const UserDTO = require('../dtos/userDTO');
 const bcrypt = require('bcrypt');
 
 // Add a friend
@@ -7,17 +9,7 @@ exports.addFriend = async (req, res) => {
     const userEmail = req.user.email;
 
     try {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email: userEmail },
-            UpdateExpression: 'ADD friends :friend',
-            ExpressionAttributeValues: {
-                ':friend': dynamoDb.createSet([friendEmail]),
-            },
-            ReturnValues: 'UPDATED_NEW',
-        };
-
-        await dynamoDb.update(params).promise();
+        await UserRepository.addFriend(userEmail, friendEmail);
         res.status(200).json({ message: 'Friend added successfully!' });
     } catch (err) {
         console.error('Error adding friend:', err.message);
@@ -30,13 +22,8 @@ exports.getFriends = async (req, res) => {
     const userEmail = req.user.email;
 
     try {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email: userEmail },
-        };
-
-        const result = await dynamoDb.get(params).promise();
-        res.status(200).json({ friends: result.Item?.friends?.values || [] });
+        const friends = await UserRepository.getFriends(userEmail);
+        res.status(200).json({ friends });
     } catch (err) {
         console.error('Error fetching friends:', err.message);
         res.status(500).json({ message: 'Failed to fetch friends.', error: err.message });
@@ -44,42 +31,23 @@ exports.getFriends = async (req, res) => {
 };
 
 // Update profile
-// Update profile with password verification
 exports.updateProfile = async (req, res) => {
     const { oldPassword, newPassword } = req.body;
     const userEmail = req.user.email;
 
     try {
-        // Fetch the user
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email: userEmail },
-        };
-
-        const user = await dynamoDb.get(params).promise();
-
-        if (!user.Item) {
+        const user = await UserRepository.findByEmail(userEmail);
+        if (!user) {
             return res.status(404).json({ message: 'User not found.' });
         }
 
-        // Verify old password
-        const isPasswordValid = await bcrypt.compare(oldPassword, user.Item.password);
+        const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
         if (!isPasswordValid) {
             return res.status(400).json({ message: 'Old password is incorrect.' });
         }
 
-        // Hash the new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        // Update the password in the database
-        const updateParams = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email: userEmail },
-            UpdateExpression: 'SET password = :newPassword',
-            ExpressionAttributeValues: { ':newPassword': hashedPassword },
-        };
-
-        await dynamoDb.update(updateParams).promise();
+        await UserRepository.updatePassword(userEmail, hashedPassword);
 
         res.status(200).json({ message: 'Password updated successfully!' });
     } catch (err) {
@@ -91,104 +59,57 @@ exports.updateProfile = async (req, res) => {
 // Fetch user profile details
 exports.getProfile = async (req, res) => {
     try {
-        const { username, email } = req.user;
+        const userEmail = req.user.email;
+        const user = await UserRepository.findByEmail(userEmail);
+        const watchlistCount = await WatchlistRepository.getWatchlistCount(userEmail);
 
-        const watchlistParams = {
-            TableName: process.env.WATCHLIST_TABLE,
-            KeyConditionExpression: 'email = :email',
-            ExpressionAttributeValues: { ':email': email },
-        };
-
-        const watchlistResponse = await dynamoDb.query(watchlistParams).promise();
-        const watchlistCount = watchlistResponse.Items.length;
-
-        res.status(200).json({ username, email, watchlistCount });
-    } catch (error) {
-        console.error('Error fetching profile:', error);
-        res.status(500).json({ message: 'Error fetching profile' });
+        const userProfile = UserDTO.toResponse(user, watchlistCount);
+        res.status(200).json(userProfile);
+    } catch (err) {
+        console.error('Error fetching profile:', err.message);
+        res.status(500).json({ message: 'Error fetching profile.' });
     }
 };
 
 // Fetch available users to follow
 exports.getAvailableUsers = async (req, res) => {
+    const { email } = req.user;
+
     try {
-        const { email } = req.user;
-
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            FilterExpression: 'email <> :email',
-            ExpressionAttributeValues: { ':email': email },
-        };
-
-        const response = await dynamoDb.scan(params).promise();
-        res.status(200).json(response.Items);
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).json({ message: 'Error fetching users' });
+        const users = await UserRepository.getAvailableUsers(email);
+        const userDTOs = users.map(UserDTO.toResponse);
+        res.status(200).json(userDTOs);
+    } catch (err) {
+        console.error('Error fetching users:', err.message);
+        res.status(500).json({ message: 'Error fetching users.' });
     }
 };
 
 // Follow a user
 exports.followUser = async (req, res) => {
     const { followedEmail } = req.body;
-    const { email: followerEmail } = req.user;
+    const followerEmail = req.user.email;
 
     try {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email: followerEmail },
-            UpdateExpression: 'ADD following :followedEmail',
-            ExpressionAttributeValues: {
-                ':followedEmail': dynamoDb.createSet([followedEmail]),
-            },
-        };
-
-        await dynamoDb.update(params).promise();
-
+        await UserRepository.followUser(followerEmail, followedEmail);
         res.status(200).json({ message: `You are now following ${followedEmail}` });
-    } catch (error) {
-        console.error('Error following user:', error);
-        res.status(500).json({ message: 'Error following user', error: error.message });
+    } catch (err) {
+        console.error('Error following user:', err.message);
+        res.status(500).json({ message: 'Error following user.', error: err.message });
     }
 };
 
+// Delete user
 exports.deleteUser = async (req, res) => {
     const userEmail = req.user.email;
 
     try {
-        // Step 1: Delete all items in the user's watchlist
-        const watchlistParams = {
-            TableName: process.env.WATCHLIST_TABLE,
-            KeyConditionExpression: 'email = :email',
-            ExpressionAttributeValues: {
-                ':email': userEmail,
-            },
-        };
-
-        const watchlistItems = await dynamoDb.query(watchlistParams).promise();
-
-        for (const item of watchlistItems.Items) {
-            const deleteParams = {
-                TableName: process.env.WATCHLIST_TABLE,
-                Key: {
-                    email: item.email,
-                    showId: item.showId,
-                },
-            };
-            await dynamoDb.delete(deleteParams).promise();
-        }
-
-        // Step 2: Delete the user from the USERS_TABLE
-        const userParams = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email: userEmail },
-        };
-
-        await dynamoDb.delete(userParams).promise();
+        await WatchlistRepository.clearUserWatchlist(userEmail);
+        await UserRepository.deleteUser(userEmail);
 
         res.status(200).json({ message: 'User and their watchlist deleted successfully.' });
-    } catch (error) {
-        console.error('Error deleting user and their watchlist:', error);
-        res.status(500).json({ message: 'Failed to delete user.', error: error.message });
+    } catch (err) {
+        console.error('Error deleting user and their watchlist:', err.message);
+        res.status(500).json({ message: 'Failed to delete user.', error: err.message });
     }
 };
