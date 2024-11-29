@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Watchlist = () => {
     const [watchlist, setWatchlist] = useState([]);
-    const navigate = useNavigate();
+    const [error, setError] = useState('');
 
     useEffect(() => {
         const fetchWatchlist = async () => {
@@ -14,65 +14,32 @@ const Watchlist = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setWatchlist(response.data);
-            } catch (error) {
-                console.error('Error fetching watchlist:', error.message);
+            } catch (err) {
+                console.error('Error fetching watchlist:', err.response?.data || err.message);
+                setError('Failed to fetch watchlist. Please try again.');
             }
         };
 
         fetchWatchlist();
     }, []);
 
-    const handleCardClick = (showId) => {
-        navigate(`/show/${showId}`);
-    };
-
     return (
-        <div style={{ padding: '20px' }}>
+        <div>
             <h1>Tracked Shows</h1>
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                    gap: '20px',
-                }}
-            >
+            {error && <p>{error}</p>}
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                 {watchlist.map((show) => (
-                    <div
-                        key={show.showId}
-                        style={{
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            border: '1px solid #ddd',
-                            borderRadius: '8px',
-                            overflow: 'hidden',
-                        }}
-                        onClick={() => handleCardClick(show.showId)}
-                    >
+                    <div key={show.showId} style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }}>
                         <img
                             src={show.poster}
                             alt={show.title}
-                            style={{ width: '100%', height: '300px', objectFit: 'cover' }}
+                            style={{ width: '150px', borderRadius: '5px' }}
                         />
                         <h3>{show.title}</h3>
-                        <p>{show.genre || 'Genre not available'}</p>
                         <p>User Rating: {show.rating}/10</p>
                     </div>
                 ))}
             </div>
-            <ul>
-                {watchlist.length > 0 ? (
-                    watchlist.map((show) => (
-                        <li key={show.showId}>
-                            <img src={show.poster} alt={show.title} style={{ width: '100px' }} />
-                            <h3>{show.title}</h3>
-                            <p>{show.description}</p>
-                            <p>Rating: {show.rating}</p>
-                        </li>
-                    ))
-                ) : (
-                    <p>Your watchlist is empty. Add some shows to get started!</p>
-                )}
-            </ul>
         </div>
     );
 };

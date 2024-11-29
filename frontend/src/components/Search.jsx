@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
+import ComparisonComponent from './ComparisonComponent';
 
 const Search = ({ searchQuery }) => {
-    const [query, setQuery] = useState(searchQuery || ''); 
+    const [query, setQuery] = useState(searchQuery || '');
     const [results, setResults] = useState([]);
     const [error, setError] = useState('');
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedShow, setSelectedShow] = useState(null);
-    const [rating, setRating] = useState(10);
 
-    // Function to fetch search results
+    // Fetch search results
     const fetchSearchResults = async (query) => {
         try {
             const token = localStorage.getItem('token');
-            if (!token) {
-                alert('You must be logged in to search for shows.');
-                return;
-            }
-
             const response = await axios.get('http://localhost:4000/search/search', {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { q: query },
@@ -32,77 +27,26 @@ const Search = ({ searchQuery }) => {
         }
     };
 
-    // Handle search button click
+    // Handle search submission
     const handleSearch = async (e) => {
         e.preventDefault();
-    
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert('You must be logged in to search for shows.');
-                return;
-            }
-    
-            const response = await axios.get('http://localhost:4000/search/search', {
-                headers: { Authorization: `Bearer ${token}` },
-                params: { q: query }, // Ensure `query` is not empty
-            });
-    
-            setResults(response.data);
-            setError('');
-        } catch (err) {
-            console.error('Error fetching search results:', err.response?.data || err.message);
-            setError(err.response?.data?.message || 'Error fetching search results.');
-        }
+        await fetchSearchResults(query);
     };
 
-    // Automatically search if `searchQuery` is passed as a prop
+    // Auto-fetch if query is passed as prop
     useEffect(() => {
         if (searchQuery) {
             fetchSearchResults(searchQuery);
         }
     }, [searchQuery]);
 
-    // Add show to the watchlist
-    const handleAddToWatchlist = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const email = localStorage.getItem('email');
-
-            if (!token || !email) {
-                alert('You must be logged in to add shows to your watchlist.');
-                return;
-            }
-
-            const payload = {
-                email,
-                showId: selectedShow.id.toString(),
-                title: selectedShow.name,
-                description: selectedShow.overview,
-                poster: `https://image.tmdb.org/t/p/w500${selectedShow.poster_path}`,
-                rating,
-            };
-
-            await axios.post('http://localhost:4000/watchlist', payload, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            alert(`${selectedShow.name} added to your watchlist with a rating of ${rating}!`);
-            setModalIsOpen(false);
-        } catch (err) {
-            console.error('Error adding to watchlist:', err.response?.data || err.message);
-            alert('Failed to add show to watchlist. Please try again.');
-        }
-    };
-
-    // Open the modal to rate the show before adding to the watchlist
+    // Open modal for adding or ranking a show
     const openModal = (show) => {
         setSelectedShow(show);
-        setRating(10); // Default rating
         setModalIsOpen(true);
     };
 
-    // Close the modal
+    // Close modal
     const closeModal = () => {
         setModalIsOpen(false);
         setSelectedShow(null);
@@ -110,6 +54,16 @@ const Search = ({ searchQuery }) => {
 
     return (
         <div>
+            <h1>Search TV Shows</h1>
+            <form onSubmit={handleSearch}>
+                <input
+                    type="text"
+                    placeholder="Search for a show..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                />
+                <button type="submit">Search</button>
+            </form>
             {error && <p>{error}</p>}
             <ul>
                 {results.map((show) => (
@@ -128,17 +82,17 @@ const Search = ({ searchQuery }) => {
             </ul>
 
             <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
-                <h2>Rate the Show</h2>
-                <p>{selectedShow?.name}</p>
-                <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    value={rating}
-                    onChange={(e) => setRating(Math.min(10, Math.max(1, Number(e.target.value))))}
-                />
-                <button onClick={handleAddToWatchlist}>Add</button>
-                <button onClick={closeModal}>Cancel</button>
+                {selectedShow ? (
+                    <ComparisonComponent
+                        newShow={selectedShow}
+                        onRankingComplete={() => {
+                            alert(`${selectedShow.name} successfully added and ranked!`);
+                            closeModal();
+                        }}
+                    />
+                ) : (
+                    <p>Loading...</p>
+                )}
             </Modal>
         </div>
     );

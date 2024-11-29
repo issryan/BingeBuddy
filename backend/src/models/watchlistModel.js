@@ -9,16 +9,24 @@ const Watchlist = {
         await dynamoDb.put(params).promise();
     },
 
-    getWatchlistByEmail: async (email) => {
+    getShowsByUser: async (email) => {
         const params = {
             TableName: process.env.WATCHLIST_TABLE,
             KeyConditionExpression: 'email = :email',
-            ExpressionAttributeValues: {
-                ':email': email,
-            },
+            ExpressionAttributeValues: { ':email': email },
         };
         const result = await dynamoDb.query(params).promise();
-        return result.Items;
+        return result.Items.sort((a, b) => a.rank - b.rank);
+    },
+    
+    updateShowRank: async (email, showId, rank) => {
+        const params = {
+            TableName: process.env.WATCHLIST_TABLE,
+            Key: { email, showId },
+            UpdateExpression: 'set rank = :rank',
+            ExpressionAttributeValues: { ':rank': rank },
+        };
+        await dynamoDb.update(params).promise();
     },
 
     removeShow: async (email, showId) => {

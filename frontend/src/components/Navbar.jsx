@@ -16,7 +16,7 @@ const Navbar = ({ onSearch }) => {
     return (
         <nav className="navbar">
             <div className="navbar-logo">
-                <Link to="/">SHOWTRACKR</Link>
+                <Link to="/">BINGEBUDDY</Link>
             </div>
             <form className="navbar-search" onSubmit={handleSearchSubmit}>
                 <input

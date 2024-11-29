@@ -6,7 +6,7 @@ const Home = () => {
 
     return (
         <div style={{ textAlign: 'center', padding: '20px' }}>
-            <h1>Welcome to ShowTrackr!</h1>
+            <h1>Welcome to BingeBuddy!</h1>
             <p>
                 Discover, track, and rate your favorite TV shows. Organize your watchlist and
                 keep track of the shows you've watched or plan to watch. Join now and
