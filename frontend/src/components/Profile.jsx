@@ -4,7 +4,7 @@ import axios from 'axios';
 import './Profile.css';
 
 const Profile = () => {
-    const [profileData, setProfileData] = useState({});
+    const [profileData, setProfileData] = useState({ following: [] });
     const [watchlist, setWatchlist] = useState([]);
     const [availableUsers, setAvailableUsers] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -26,7 +26,12 @@ const Profile = () => {
             const response = await axios.get('http://localhost:4000/users/profile', {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setProfileData(response.data);
+            setProfileData({
+                ...response.data,
+                followersCount: response.data.followers?.length || 0,
+                followingCount: response.data.following?.length || 0,
+                following: response.data.following || [],
+            });
         } catch (error) {
             console.error('Error fetching profile data:', error);
         }
@@ -64,10 +69,37 @@ const Profile = () => {
                 { followedEmail },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert(`You are now following ${followedEmail}`);
-            fetchAvailableUsers(); // Refresh the available users list
+
+            setProfileData((prev) => ({
+                ...prev,
+                following: Array.isArray(prev.following)
+                    ? [...prev.following, followedEmail]
+                    : [followedEmail],
+            }));
         } catch (error) {
             console.error('Error following user:', error);
+            alert('Failed to follow user. Please try again.');
+        }
+    };
+
+    const handleUnfollowUser = async (unfollowedEmail) => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.post(
+                'http://localhost:4000/users/unfollow',
+                { followedEmail: unfollowedEmail },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            setProfileData((prev) => ({
+                ...prev,
+                following: Array.isArray(prev.following)
+                    ? prev.following.filter((email) => email !== unfollowedEmail)
+                    : [],
+            }));
+        } catch (error) {
+            console.error('Error unfollowing user:', error);
+            alert('Failed to unfollow user. Please try again.');
         }
     };
 
@@ -151,7 +183,7 @@ const Profile = () => {
                     </div>
                     <div className="profile-buttons">
                         <button className="edit-profile-button" onClick={openEditModal}>
-                            Edit Profile
+                            Change Password
                         </button>
                         <button className="logout-button" onClick={handleLogout}>
                             Logout
@@ -188,7 +220,15 @@ const Profile = () => {
                         {availableUsers.map((user) => (
                             <li key={user.email} className="friend-card">
                                 <p>{user.username}</p>
-                                <button onClick={() => handleFollowUser(user.email)}>Follow</button>
+                                <button
+                                    onClick={() =>
+                                        profileData.following?.includes(user.email)
+                                            ? handleUnfollowUser(user.email)
+                                            : handleFollowUser(user.email)
+                                    }
+                                >
+                                    {profileData.following?.includes(user.email) ? 'Unfollow' : 'Follow'}
+                                </button>
                             </li>
                         ))}
                     </ul>
@@ -198,7 +238,7 @@ const Profile = () => {
             {isEditModalOpen && (
                 <div className="edit-modal">
                     <div className="edit-modal-content">
-                        <h3>Edit Profile</h3>
+                        <h3>Change Password</h3>
                         <label>
                             Old Password:
                             <input

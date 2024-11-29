@@ -20,19 +20,6 @@ const UserRepository = {
         return result.Item || null;
     },
 
-    // Add a friend
-    addFriend: async (userEmail, friendEmail) => {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email: userEmail },
-            UpdateExpression: 'ADD friends :friend',
-            ExpressionAttributeValues: {
-                ':friend': dynamoDb.createSet([friendEmail]),
-            },
-        };
-        await dynamoDb.update(params).promise();
-    },
-
     // Get friends of a user
     getFriends: async (userEmail) => {
         const params = {
@@ -72,19 +59,6 @@ const UserRepository = {
         };
         const result = await dynamoDb.scan(params).promise();
         return result.Items || [];
-    },
-
-    // Follow another user
-    followUser: async (followerEmail, followedEmail) => {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email: followerEmail },
-            UpdateExpression: 'ADD following :followedEmail',
-            ExpressionAttributeValues: {
-                ':followedEmail': dynamoDb.createSet([followedEmail]),
-            },
-        };
-        await dynamoDb.update(params).promise();
     },
 };
 
