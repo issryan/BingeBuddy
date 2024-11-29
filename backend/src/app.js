@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const watchlistRoutes = require('./routes/watchlistRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(bodyParser.json());
 app.use('/auth', authRoutes);
 app.use('/search', searchRoutes);
 app.use('/watchlist', watchlistRoutes);
+app.use('/users', userRoutes);
 
 app.get('/', (req, res) => res.send('BingeBuddy API is running!'));
 

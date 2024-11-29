@@ -7,6 +7,9 @@ const Profile = () => {
     const [profileData, setProfileData] = useState({});
     const [watchlist, setWatchlist] = useState([]);
     const [availableUsers, setAvailableUsers] = useState([]);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [updatedEmail, setUpdatedEmail] = useState('');
+    const [updatedPassword, setUpdatedPassword] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,7 +36,7 @@ const Profile = () => {
             const response = await axios.get('http://localhost:4000/watchlist', {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setWatchlist(response.data.slice(0, 5)); // Only show top 5 shows
+            setWatchlist(response.data.slice(0, 5));
         } catch (error) {
             console.error('Error fetching watchlist:', error);
         }
@@ -60,14 +63,44 @@ const Profile = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             alert(`You are now following ${followedEmail}`);
-            fetchAvailableUsers(); // Refresh available users list
+            fetchAvailableUsers();
         } catch (error) {
             console.error('Error following user:', error);
         }
     };
 
     const handleViewFullWatchlist = () => {
-        navigate('/watchlist'); // Redirect to the full watchlist page
+        navigate('/watchlist');
+    };
+
+    // Open edit profile modal
+    const openEditModal = () => {
+        setIsEditModalOpen(true);
+        setUpdatedEmail(profileData.email || '');
+        setUpdatedPassword(''); // Clear password input
+    };
+
+    // Close edit profile modal
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
+    };
+
+    // Handle profile update
+    const handleProfileUpdate = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.patch(
+                'http://localhost:4000/users/update-profile',
+                { email: updatedEmail, password: updatedPassword },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            alert(response.data.message);
+            closeEditModal();
+            fetchProfileData(); // Refresh profile data
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            alert('Failed to update profile. Please try again.');
+        }
     };
 
     return (
@@ -76,7 +109,7 @@ const Profile = () => {
                 <div className="profile-details">
                     <img
                         className="profile-avatar"
-                        src="https://via.placeholder.com/120" // Replace with user's avatar if available
+                        src="https://via.placeholder.com/120"
                         alt={profileData.username}
                     />
                     <h2>{profileData.username || 'Username'}</h2>
@@ -86,6 +119,9 @@ const Profile = () => {
                         <span>{profileData.followingCount || 0} Following</span>
                         <span>{profileData.showsWatched || watchlist.length} Shows Watched</span>
                     </div>
+                    <button className="edit-profile-button" onClick={openEditModal}>
+                        Edit Profile
+                    </button>
                 </div>
             </div>
             <div className="profile-content">
@@ -120,6 +156,32 @@ const Profile = () => {
                     </ul>
                 </div>
             </div>
+
+            {isEditModalOpen && (
+                <div className="edit-modal">
+                    <div className="edit-modal-content">
+                        <h3>Edit Profile</h3>
+                        <label>
+                            Email:
+                            <input
+                                type="email"
+                                value={updatedEmail}
+                                onChange={(e) => setUpdatedEmail(e.target.value)}
+                            />
+                        </label>
+                        <label>
+                            Password:
+                            <input
+                                type="password"
+                                value={updatedPassword}
+                                onChange={(e) => setUpdatedPassword(e.target.value)}
+                            />
+                        </label>
+                        <button onClick={handleProfileUpdate}>Save Changes</button>
+                        <button onClick={closeEditModal}>Cancel</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

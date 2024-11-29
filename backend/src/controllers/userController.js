@@ -84,7 +84,6 @@ exports.getProfile = async (req, res) => {
     try {
         const { username, email } = req.user;
 
-        // Count watchlist items
         const watchlistParams = {
             TableName: process.env.WATCHLIST_TABLE,
             KeyConditionExpression: 'email = :email',
@@ -94,32 +93,7 @@ exports.getProfile = async (req, res) => {
         const watchlistResponse = await dynamoDb.query(watchlistParams).promise();
         const watchlistCount = watchlistResponse.Items.length;
 
-        // Count followers and following
-        const followersParams = {
-            TableName: process.env.FOLLOWERS_TABLE,
-            KeyConditionExpression: 'followedEmail = :email',
-            ExpressionAttributeValues: { ':email': email },
-        };
-
-        const followersResponse = await dynamoDb.query(followersParams).promise();
-        const followersCount = followersResponse.Items.length;
-
-        const followingParams = {
-            TableName: process.env.FOLLOWERS_TABLE,
-            KeyConditionExpression: 'followerEmail = :email',
-            ExpressionAttributeValues: { ':email': email },
-        };
-
-        const followingResponse = await dynamoDb.query(followingParams).promise();
-        const followingCount = followingResponse.Items.length;
-
-        res.status(200).json({
-            username,
-            email,
-            watchlistCount,
-            followersCount,
-            followingCount,
-        });
+        res.status(200).json({ username, email, watchlistCount });
     } catch (error) {
         console.error('Error fetching profile:', error);
         res.status(500).json({ message: 'Error fetching profile' });
@@ -133,7 +107,7 @@ exports.getAvailableUsers = async (req, res) => {
 
         const params = {
             TableName: process.env.USERS_TABLE,
-            FilterExpression: 'email <> :email', // Exclude current user
+            FilterExpression: 'email <> :email',
             ExpressionAttributeValues: { ':email': email },
         };
 
