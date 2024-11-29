@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Watchlist = () => {
     const [watchlist, setWatchlist] = useState([]);
-    const [sortedWatchlist, setSortedWatchlist] = useState([]);
-    const [error, setError] = useState('');
-    const [sortOption, setSortOption] = useState('rating'); 
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchWatchlist = async () => {
@@ -15,36 +14,50 @@ const Watchlist = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setWatchlist(response.data);
-                setSortedWatchlist(response.data); 
-                setError('');
-            } catch (err) {
-                console.error('Error fetching watchlist:', err);
-                setError('Failed to fetch watchlist. Please try again.');
+            } catch (error) {
+                console.error('Error fetching watchlist:', error.message);
             }
         };
 
         fetchWatchlist();
     }, []);
 
-    const handleSort = (option) => {
-        setSortOption(option);
-        const sorted = [...watchlist].sort((a, b) => {
-            if (option === 'rating') return b.rating - a.rating;
-            if (option === 'title') return a.title.localeCompare(b.title);
-        });
-        setSortedWatchlist(sorted);
+    const handleCardClick = (showId) => {
+        navigate(`/show/${showId}`);
     };
 
     return (
-        <div>
-            <h1>Your Watchlist</h1>
-            {error && <p>{error}</p>}
-            <div>
-                <label>Sort by: </label>
-                <select value={sortOption} onChange={(e) => handleSort(e.target.value)}>
-                    <option value="rating">Rating</option>
-                    <option value="title">Title</option>
-                </select>
+        <div style={{ padding: '20px' }}>
+            <h1>Tracked Shows</h1>
+            <div
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                    gap: '20px',
+                }}
+            >
+                {watchlist.map((show) => (
+                    <div
+                        key={show.showId}
+                        style={{
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            border: '1px solid #ddd',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                        }}
+                        onClick={() => handleCardClick(show.showId)}
+                    >
+                        <img
+                            src={show.poster}
+                            alt={show.title}
+                            style={{ width: '100%', height: '300px', objectFit: 'cover' }}
+                        />
+                        <h3>{show.title}</h3>
+                        <p>{show.genre || 'Genre not available'}</p>
+                        <p>User Rating: {show.rating}/10</p>
+                    </div>
+                ))}
             </div>
             <ul>
                 {watchlist.length > 0 ? (

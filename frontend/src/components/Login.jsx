@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -21,16 +23,15 @@ const Login = () => {
             localStorage.setItem('username', response.data.username);
 
             setErrorMessage('');
-            alert('Login successful! Redirecting to search...');
-            // Redirect to search or watchlist
-            window.location.href = '/search';
+            alert('Login successful! Redirecting to your watchlist...');
+            navigate('/search');
         } catch (error) {
             setErrorMessage(error.response?.data?.message || 'Error logging in');
         }
     };
 
     return (
-        <div>
+        <div style={{ textAlign: 'center', padding: '20px' }}>
             <h1>Login</h1>
             <form onSubmit={handleLogin}>
                 <input
@@ -38,16 +39,33 @@ const Login = () => {
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                 />
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                 />
                 <button type="submit">Login</button>
             </form>
-            {errorMessage && <p>{errorMessage}</p>}
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+            <p>
+                Don’t have an account?{' '}
+                <button
+                    style={{
+                        color: 'blue',
+                        textDecoration: 'underline',
+                        border: 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                    }}
+                    onClick={() => navigate('/register')}
+                >
+                    Sign Up
+                </button>
+            </p>
         </div>
     );
 };

@@ -1,30 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
 
-const Search = () => {
-    const [query, setQuery] = useState('');
+const Search = ({ searchQuery }) => {
+    const [query, setQuery] = useState(searchQuery || ''); 
     const [results, setResults] = useState([]);
     const [error, setError] = useState('');
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedShow, setSelectedShow] = useState(null);
     const [rating, setRating] = useState(10);
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-    
+    // Function to fetch search results
+    const fetchSearchResults = async (query) => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
                 alert('You must be logged in to search for shows.');
                 return;
             }
-    
+
             const response = await axios.get('http://localhost:4000/search/search', {
-                headers: { Authorization: `Bearer ${token}` }, // Ensure token is added
+                headers: { Authorization: `Bearer ${token}` },
                 params: { q: query },
             });
-    
+
             setResults(response.data);
             setError('');
         } catch (err) {
@@ -33,6 +32,20 @@ const Search = () => {
         }
     };
 
+    // Handle search button click
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        if (query) fetchSearchResults(query);
+    };
+
+    // Automatically search if `searchQuery` is passed as a prop
+    useEffect(() => {
+        if (searchQuery) {
+            fetchSearchResults(searchQuery);
+        }
+    }, [searchQuery]);
+
+    // Add show to the watchlist
     const handleAddToWatchlist = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -64,12 +77,14 @@ const Search = () => {
         }
     };
 
+    // Open the modal to rate the show before adding to the watchlist
     const openModal = (show) => {
         setSelectedShow(show);
         setRating(10); // Default rating
         setModalIsOpen(true);
     };
 
+    // Close the modal
     const closeModal = () => {
         setModalIsOpen(false);
         setSelectedShow(null);
