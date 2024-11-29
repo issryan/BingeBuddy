@@ -4,87 +4,86 @@ import axios from 'axios';
 const ComparisonComponent = ({ newShow, onRankingComplete }) => {
     const [comparisonShow, setComparisonShow] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [low, setLow] = useState(0); // Start of the ranking range
+    const [high, setHigh] = useState(0); // End of the ranking range
+    const [watchlist, setWatchlist] = useState([]); // Full watchlist for comparisons
 
-    const fetchComparisonShow = async () => {
+    // Fetch the watchlist and initialize the range
+    const fetchWatchlist = async () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:4000/watchlist', {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            const watchlist = response.data;
+            const items = response.data;
+            setWatchlist(items);
 
-            if (watchlist.length === 0) {
-                setComparisonShow(null); // No comparison needed for the first show
-                return;
+            if (items.length > 0) {
+                setLow(0);
+                setHigh(items.length - 1);
+                setComparisonShow(items[Math.floor((0 + items.length - 1) / 2)]); // Compare with middle show first
             }
-
-            const middleIndex = Math.floor(watchlist.length / 2);
-            setComparisonShow(watchlist[middleIndex]);
         } catch (err) {
-            console.error('Error fetching comparison show:', err);
+            console.error('Error fetching watchlist:', err);
             setComparisonShow(null);
         }
     };
 
-    const handleAddFirstShow = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const email = localStorage.getItem('email');
-
-            await axios.post(
-                'http://localhost:4000/watchlist',
-                {
-                    email,
-                    showId: newShow.id.toString(),
-                    title: newShow.name,
-                    description: newShow.overview,
-                    poster: `https://image.tmdb.org/t/p/w500${newShow.poster_path}`,
-                    rating: 10, // Automatically assign the first show a 10
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            alert(`${newShow.name} added as your first show with a rating of 10!`);
-            onRankingComplete();
-        } catch (err) {
-            console.error('Error adding first show:', err.response?.data || err.message);
-            alert('Failed to add the first show. Please try again.');
-        }
-    };
-
+    // Handle user preference for the comparison
     const handleComparison = async (preference) => {
-        if (!newShow || !comparisonShow) {
-            console.error('Comparison data missing.');
+        if (!comparisonShow || !newShow) {
+            console.error('Comparison or new show missing.');
             return;
         }
 
+        if (loading) return; // Prevent multiple requests
         setLoading(true);
+
         try {
-            const token = localStorage.getItem('token');
-            const email = localStorage.getItem('email');
+            const mid = Math.floor((low + high) / 2);
 
-            await axios.post(
-                'http://localhost:4000/watchlist/compare',
-                {
-                    email,
-                    newShow,
-                    comparisonShowId: comparisonShow.showId,
-                    preference,
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            if (preference === 'new') {
+                // User prefers the new show over the current comparison
+                setHigh(mid - 1);
+            } else {
+                // User prefers the existing comparison show
+                setLow(mid + 1);
+            }
 
-            onRankingComplete();
+            // Check if the range is narrowed down to one position
+            if (low > high) {
+                const token = localStorage.getItem('token');
+                const email = localStorage.getItem('email');
+
+                // Finalize the ranking in the backend
+                await axios.post(
+                    'http://localhost:4000/watchlist/compare',
+                    {
+                        email,
+                        newShow,
+                        comparisonShowId: comparisonShow.showId,
+                        preference,
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                alert(`${newShow.name} has been added to your watchlist!`);
+                onRankingComplete(); // Notify parent that ranking is complete
+            } else {
+                // Continue to the next comparison
+                const nextMid = Math.floor((low + high) / 2);
+                setComparisonShow(watchlist[nextMid]);
+            }
         } catch (err) {
-            console.error('Error ranking show:', err.response?.data || err.message);
+            console.error('Error ranking show:', err);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchComparisonShow();
+        fetchWatchlist();
     }, []);
 
     if (!newShow) {
@@ -94,16 +93,16 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
     if (!comparisonShow) {
         return (
             <div>
-                <p>{newShow.name} will be added as your first show!</p>
-                <button onClick={handleAddFirstShow}>Confirm</button>
+                <p>{newShow.name} will be added to your watchlist as the first show.</p>
+                <button onClick={onRankingComplete}>Confirm</button>
             </div>
         );
     }
 
     return (
         <div>
-            <h2>Which show do you prefer?</h2>
-            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            <h1>Compare Shows</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div onClick={() => handleComparison('new')} style={{ cursor: 'pointer' }}>
                     <img
                         src={`https://image.tmdb.org/t/p/w500${newShow.poster_path}`}
