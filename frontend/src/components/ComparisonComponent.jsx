@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './ComparisonComponent.css';
 
 const ComparisonComponent = ({ newShow, onRankingComplete }) => {
     const [comparisonShow, setComparisonShow] = useState(null);
@@ -121,27 +122,28 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
     }
 
     return (
-        <div>
-            <h1>Compare Shows</h1>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div onClick={() => handleComparison('new')} style={{ cursor: 'pointer' }}>
+        <div className="comparison-modal">
+            <h2>Which show do you like more?</h2>
+            <div className="comparison-container">
+                <div className="comparison-box" onClick={() => handleComparison('new')}>
                     <img
                         src={`https://image.tmdb.org/t/p/w500${newShow.poster_path}`}
                         alt={newShow.name}
-                        style={{ width: '150px' }}
+                        className="comparison-poster"
                     />
-                    <p>{newShow.name}</p>
+                    <p className="comparison-title">{newShow.name}</p>
                 </div>
-                <div onClick={() => handleComparison('existing')} style={{ cursor: 'pointer' }}>
+                <p className="comparison-or">OR</p>
+                <div className="comparison-box" onClick={() => handleComparison('existing')}>
                     <img
                         src={`https://image.tmdb.org/t/p/w500${comparisonShow.poster}`}
                         alt={comparisonShow.title}
-                        style={{ width: '150px' }}
+                        className="comparison-poster"
                     />
-                    <p>{comparisonShow.title}</p>
+                    <p className="comparison-title">{comparisonShow.title}</p>
                 </div>
             </div>
-            {loading && <p>Saving your preference...</p>}
+            {loading && <p className="loading-text">Saving your preference...</p>}
         </div>
     );
 };

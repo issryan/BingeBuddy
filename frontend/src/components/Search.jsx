@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
 import ComparisonComponent from './ComparisonComponent';
+import './Search.css';
 
 const Search = ({ searchQuery }) => {
     const [query, setQuery] = useState(searchQuery || '');
@@ -53,30 +54,38 @@ const Search = ({ searchQuery }) => {
     };
 
     return (
-        <div>
-            <h1>Search TV Shows</h1>
-            <form onSubmit={handleSearch}>
+        <div className="search-page">
+            <form onSubmit={handleSearch} className="search-bar">
                 <input
                     type="text"
-                    placeholder="Search for a show..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search for a show..."
                 />
                 <button type="submit">Search</button>
             </form>
-            {error && <p>{error}</p>}
-            <ul>
+            {error && <p className="error">{error}</p>}
+            <ul className="search-results">
                 {results.map((show) => (
-                    <li key={show.id}>
-                        <img
-                            src={`https://image.tmdb.org/t/p/w500${show.poster_path}`}
-                            alt={show.name}
-                            style={{ width: '100px' }}
-                        />
-                        <h3>{show.name}</h3>
-                        <p>{show.overview}</p>
-                        <p>Rating: {show.vote_average}</p>
-                        <button onClick={() => openModal(show)}>Add to Watchlist</button>
+                    <li key={show.id} className="search-result-item">
+                        <div className="poster-container">
+                            <img
+                                src={`https://image.tmdb.org/t/p/w500${show.poster_path}`}
+                                alt={show.name}
+                                className="poster"
+                            />
+                        </div>
+                        <div className="show-details">
+                            <h3>{show.name}</h3>
+                            <p className="show-genre">
+                                Genre: {show.genre_ids?.join(', ') || 'Unknown'}
+                            </p>
+                            <p className="show-overview">{show.overview}</p>
+                            <p className="show-rating">Rating: {show.vote_average || 'N/A'}</p>
+                            <div className="action-buttons">
+                                <button onClick={() => openModal(show)}>Add to Watchlist</button>
+                            </div>
+                        </div>
                     </li>
                 ))}
             </ul>

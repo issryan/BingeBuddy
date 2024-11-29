@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './Watchlist.css';
 import { useNavigate } from 'react-router-dom';
 
 const Watchlist = () => {
@@ -24,19 +25,21 @@ const Watchlist = () => {
     }, []);
 
     return (
-        <div>
-            <h1>Tracked Shows</h1>
-            {error && <p>{error}</p>}
-            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+        <div className="watchlist-page">
+            <h1 className="watchlist-title">Your Show Ratings</h1>
+            {error && <p className="error-message">{error}</p>}
+            <div className="watchlist-grid">
                 {watchlist.map((show) => (
-                    <div key={show.showId} style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }}>
+                    <div key={show.showId} className="show-card">
                         <img
                             src={show.poster}
                             alt={show.title}
-                            style={{ width: '150px', borderRadius: '5px' }}
+                            className="show-card-poster"
                         />
-                        <h3>{show.title}</h3>
-                        <p>User Rating: {show.rating}/10</p>
+                        <div className="show-card-details">
+                            <h3 className="show-title">{show.title}</h3>
+                            <p className="show-rating">User Rating: {show.rating}/10</p>
+                        </div>
                     </div>
                 ))}
             </div>
