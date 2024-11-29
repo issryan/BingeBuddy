@@ -35,7 +35,25 @@ const Search = ({ searchQuery }) => {
     // Handle search button click
     const handleSearch = async (e) => {
         e.preventDefault();
-        if (query) fetchSearchResults(query);
+    
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('You must be logged in to search for shows.');
+                return;
+            }
+    
+            const response = await axios.get('http://localhost:4000/search/search', {
+                headers: { Authorization: `Bearer ${token}` },
+                params: { q: query }, // Ensure `query` is not empty
+            });
+    
+            setResults(response.data);
+            setError('');
+        } catch (err) {
+            console.error('Error fetching search results:', err.response?.data || err.message);
+            setError(err.response?.data?.message || 'Error fetching search results.');
+        }
     };
 
     // Automatically search if `searchQuery` is passed as a prop
@@ -92,16 +110,6 @@ const Search = ({ searchQuery }) => {
 
     return (
         <div>
-            <h1>Search TV Shows</h1>
-            <form onSubmit={handleSearch}>
-                <input
-                    type="text"
-                    placeholder="Search for a show..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                />
-                <button type="submit">Search</button>
-            </form>
             {error && <p>{error}</p>}
             <ul>
                 {results.map((show) => (
