@@ -10,6 +10,7 @@ router.get('/friends', authenticateToken, userController.getFriends);
 // Profile-related routes
 router.patch('/update-profile', authenticateToken, userController.updateProfile);
 router.get('/profile', authenticateToken, userController.getProfile);
+router.delete('/delete', authenticateToken, userController.deleteUser);
 
 // User suggestions and follow functionality
 router.get('/users', authenticateToken, userController.getAvailableUsers);
