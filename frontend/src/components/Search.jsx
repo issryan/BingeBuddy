@@ -12,18 +12,24 @@ const Search = () => {
 
     const handleSearch = async (e) => {
         e.preventDefault();
-
+    
         try {
             const token = localStorage.getItem('token');
+            if (!token) {
+                alert('You must be logged in to search for shows.');
+                return;
+            }
+    
             const response = await axios.get('http://localhost:4000/search/search', {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${token}` }, // Ensure token is added
                 params: { q: query },
             });
+    
             setResults(response.data);
             setError('');
         } catch (err) {
             console.error('Error fetching search results:', err.response?.data || err.message);
-            setError('Error fetching search results.');
+            setError(err.response?.data?.message || 'Error fetching search results.');
         }
     };
 
@@ -106,7 +112,7 @@ const Search = () => {
                     min="1"
                     max="10"
                     value={rating}
-                    onChange={(e) => setRating(e.target.value)}
+                    onChange={(e) => setRating(Math.min(10, Math.max(1, Number(e.target.value))))}
                 />
                 <button onClick={handleAddToWatchlist}>Add</button>
                 <button onClick={closeModal}>Cancel</button>

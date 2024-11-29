@@ -7,6 +7,9 @@ const router = express.Router();
 router.get('/search', authenticateToken, async (req, res) => {
     const query = req.query.q;
 
+    console.log('Query received:', query); // Debug log
+    console.log('Authenticated user:', req.user); // Debug log
+
     if (!query) {
         return res.status(400).json({ message: 'Search query is required' });
     }
@@ -26,7 +29,7 @@ router.get('/search', authenticateToken, async (req, res) => {
 
         res.status(200).json(results);
     } catch (err) {
-        console.error("Error fetching TV shows:", err.message);
+        console.error('Error fetching TV shows:', err.message);
         res.status(500).json({ message: 'Error fetching TV shows', error: err.message });
     }
 });

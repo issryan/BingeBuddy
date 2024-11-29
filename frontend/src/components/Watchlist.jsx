@@ -18,8 +18,8 @@ const Watchlist = () => {
                 setSortedWatchlist(response.data); 
                 setError('');
             } catch (err) {
-                console.error('Error fetching watchlist:', err.response?.data || err.message);
-                setError('Failed to load watchlist.');
+                console.error('Error fetching watchlist:', err);
+                setError('Failed to fetch watchlist. Please try again.');
             }
         };
 
@@ -47,14 +47,18 @@ const Watchlist = () => {
                 </select>
             </div>
             <ul>
-                {sortedWatchlist.map((show) => (
-                    <li key={show.showId}>
-                        <img src={show.poster} alt={show.title} style={{ width: '100px' }} />
-                        <h3>{show.title}</h3>
-                        <p>{show.description}</p>
-                        <p>Rating: {show.rating}</p>
-                    </li>
-                ))}
+                {watchlist.length > 0 ? (
+                    watchlist.map((show) => (
+                        <li key={show.showId}>
+                            <img src={show.poster} alt={show.title} style={{ width: '100px' }} />
+                            <h3>{show.title}</h3>
+                            <p>{show.description}</p>
+                            <p>Rating: {show.rating}</p>
+                        </li>
+                    ))
+                ) : (
+                    <p>Your watchlist is empty. Add some shows to get started!</p>
+                )}
             </ul>
         </div>
     );
