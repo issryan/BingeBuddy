@@ -9,11 +9,17 @@ const Login = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+    if (!API_BASE_URL) {
+        console.error("API_BASE_URL is not defined in the .env file.");
+    }
+
     const handleLogin = async (e) => {
         e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:4000/auth/login', {
+            const response = await axios.post(`${API_BASE_URL}/auth/login`, {
                 email,
                 password,
             });

@@ -5,10 +5,16 @@ import './Discover.css';
 const Discover = () => {
     const [shows, setShows] = useState([]);
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+    if (!API_BASE_URL) {
+        console.error("API_BASE_URL is not defined in the .env file.");
+    }
+
     useEffect(() => {
         const fetchDiscoverShows = async () => {
             try {
-                const response = await axios.get('http://localhost:4000/watchlist/discover');
+                const response = await axios.get(`${API_BASE_URL}/watchlist/discover`);
                 setShows(response.data);
             } catch (err) {
                 console.error('Error fetching discover shows:', err);
@@ -16,7 +22,7 @@ const Discover = () => {
         };
 
         fetchDiscoverShows();
-    }, []);
+    }, [API_BASE_URL]);
 
     return (
         <div className="discover-page">

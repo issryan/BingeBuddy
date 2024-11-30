@@ -14,6 +14,8 @@ const Profile = () => {
     const [updatedConfirmPassword, setUpdatedConfirmPassword] = useState(''); 
     const navigate = useNavigate();
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
     useEffect(() => {
         fetchProfileData();
         fetchWatchlist();
@@ -23,7 +25,7 @@ const Profile = () => {
     const fetchProfileData = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:4000/users/profile', {
+            const response = await axios.get(`${API_BASE_URL}/users/profile`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setProfileData({
@@ -40,7 +42,7 @@ const Profile = () => {
     const fetchWatchlist = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:4000/watchlist', {
+            const response = await axios.get(`${API_BASE_URL}/watchlist`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setWatchlist(response.data.slice(0, 5)); // Only display the top 5 shows
@@ -52,7 +54,7 @@ const Profile = () => {
     const fetchAvailableUsers = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:4000/users/users', {
+            const response = await axios.get(`${API_BASE_URL}/users/users`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setAvailableUsers(response.data);
@@ -65,7 +67,7 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.post(
-                'http://localhost:4000/users/follow',
+                `${API_BASE_URL}/users/follow`,
                 { followedEmail },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -86,7 +88,7 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.post(
-                'http://localhost:4000/users/unfollow',
+                `${API_BASE_URL}/users/unfollow`,
                 { followedEmail: unfollowedEmail },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -107,7 +109,7 @@ const Profile = () => {
         if (window.confirm('Are you sure you want to delete your account? This action is irreversible.')) {
             try {
                 const token = localStorage.getItem('token');
-                await axios.delete('http://localhost:4000/users/delete', {
+                await axios.delete(`${API_BASE_URL}/users/delete`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 alert('Your account has been deleted.');
@@ -139,7 +141,7 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.patch(
-                'http://localhost:4000/users/update-profile',
+                `${API_BASE_URL}/users/update-profile`,
                 {
                     oldPassword: updatedOldPassword,
                     newPassword: updatedNewPassword,

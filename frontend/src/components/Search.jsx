@@ -11,11 +11,13 @@ const Search = ({ searchQuery }) => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedShow, setSelectedShow] = useState(null);
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
     // Fetch search results
     const fetchSearchResults = async (query) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:4000/search/search', {
+            const response = await axios.get(`${API_BASE_URL}/search/search`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { q: query },
             });

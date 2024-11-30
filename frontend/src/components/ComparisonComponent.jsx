@@ -9,10 +9,16 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
     const [high, setHigh] = useState(0);
     const [watchlist, setWatchlist] = useState([]);
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+    if (!API_BASE_URL) {
+        console.error("API_BASE_URL is not defined in the .env file.");
+    }
+
     const fetchWatchlist = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:4000/watchlist', {
+            const response = await axios.get(`${API_BASE_URL}/watchlist`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -53,7 +59,7 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
                 const email = localStorage.getItem('email');
 
                 await axios.post(
-                    'http://localhost:4000/watchlist/compare',
+                    `${API_BASE_URL}/watchlist/compare`,
                     {
                         email,
                         newShow,
@@ -104,7 +110,7 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
                 <button
                     onClick={async () => {
                         try {
-                            await axios.post('http://localhost:4000/watchlist', payload, {
+                            await axios.post(`${API_BASE_URL}/watchlist`, payload, {
                                 headers: { Authorization: `Bearer ${token}` },
                             });
                             alert(`${newShow.name} has been added to your watchlist!`);
