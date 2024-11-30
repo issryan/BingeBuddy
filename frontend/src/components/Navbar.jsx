@@ -41,7 +41,7 @@ const Navbar = ({ onSearch }) => {
                 <li>
                     <Link to="/profile">Profile</Link>
                 </li>
-                <button className="logout-button" onClick={handleLogout}>
+                <button className="navbar-logout" onClick={handleLogout}>
                     Logout
                 </button>
             </ul>
