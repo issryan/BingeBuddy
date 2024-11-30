@@ -13,6 +13,11 @@ const Navbar = ({ onSearch }) => {
         navigate('/search');
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('token'); // Clear token from localStorage
+        localStorage.removeItem('email'); // Clear email from localStorage (if stored)
+        navigate('/login'); // Redirect to the login page
+    };
     return (
         <nav className="navbar">
             <div className="navbar-logo">
@@ -36,6 +41,9 @@ const Navbar = ({ onSearch }) => {
                 <li>
                     <Link to="/profile">Profile</Link>
                 </li>
+                <button className="logout-button" onClick={handleLogout}>
+                    Logout
+                </button>
             </ul>
         </nav>
     );

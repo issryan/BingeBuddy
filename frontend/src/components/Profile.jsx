@@ -9,9 +9,9 @@ const Profile = () => {
     const [availableUsers, setAvailableUsers] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [updatedUsername, setUpdatedUsername] = useState(false);
-    const [updatedOldPassword, setUpdatedOldPassword] = useState(''); // Add this line
-    const [updatedNewPassword, setUpdatedNewPassword] = useState(''); // Rename variable for clarity
-    const [updatedConfirmPassword, setUpdatedConfirmPassword] = useState(''); // Add confirmation field
+    const [updatedOldPassword, setUpdatedOldPassword] = useState(''); 
+    const [updatedNewPassword, setUpdatedNewPassword] = useState(''); 
+    const [updatedConfirmPassword, setUpdatedConfirmPassword] = useState(''); 
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -103,12 +103,6 @@ const Profile = () => {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('token'); // Clear token from localStorage
-        localStorage.removeItem('email'); // Clear email from localStorage (if stored)
-        navigate('/login'); // Redirect to the login page
-    };
-
     const handleDeleteUser = async () => {
         if (window.confirm('Are you sure you want to delete your account? This action is irreversible.')) {
             try {
@@ -185,9 +179,6 @@ const Profile = () => {
                         <button className="edit-profile-button" onClick={openEditModal}>
                             Change Password
                         </button>
-                        <button className="logout-button" onClick={handleLogout}>
-                            Logout
-                        </button>
                         <button className="delete-account-button" onClick={handleDeleteUser}>
                             Delete Account
                         </button>
@@ -197,7 +188,7 @@ const Profile = () => {
             <div className="profile-content">
                 <div className="watchlist-section">
                     <h3>Top Shows in My Watchlist</h3>
-                    <div className="watchlist-grid">
+                    <div className="watchlist-grid-profile">
                         {watchlist.map((show) => (
                             <div className="watchlist-card" key={show.showId}>
                                 <img
