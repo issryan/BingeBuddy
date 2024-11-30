@@ -12,16 +12,15 @@ const Search = ({ searchQuery }) => {
     const [selectedShow, setSelectedShow] = useState(null);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const apiKey = process.env.REACT_APP_API_KEY;
-
+    const API_KEY = process.env.REACT_APP_API_KEY;
 
     // Fetch search results
     const fetchSearchResults = async (query) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/search/search`, {
+            const response = await axios.get(`${API_BASE_URL}/search/search?apikey=${API_KEY}`, {
                 headers: { Authorization: `Bearer ${token}` },
-                params: { q: query, apikey: apiKey },
+                params: { q: query },
             });
 
             setResults(response.data);

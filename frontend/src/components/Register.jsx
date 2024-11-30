@@ -13,7 +13,7 @@ const Register = () => {
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const apiKey = process.env.REACT_APP_API_KEY;
+    const API_KEY = process.env.REACT_APP_API_KEY;
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -24,11 +24,10 @@ const Register = () => {
         }
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/auth/register`, {
+            const response = await axios.post(`${API_BASE_URL}/auth/register?apikey=${API_KEY}`, {
                 email,
                 username,
                 password,
-                params: { q: query, apikey: apiKey }
             });
 
             setSuccessMessage('Registration successful! You can now log in.');

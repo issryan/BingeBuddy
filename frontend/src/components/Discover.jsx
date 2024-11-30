@@ -13,13 +13,14 @@ const Discover = () => {
         console.error("API_BASE_URL is not defined in the .env file.");
     }
 
+    if (!apiKey) {
+        console.error("REACT_APP_API_KEY is not defined in the .env file.");
+    }
+
     useEffect(() => {
         const fetchDiscoverShows = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/watchlist/discover`, {
-                    params: { apikey: apiKey },
-                });
-
+                const response = await axios.get(`${API_BASE_URL}/watchlist/discover?apikey=${apiKey}`);
                 setShows(response.data);
             } catch (err) {
                 console.error('Error fetching discover shows:', err);
@@ -27,7 +28,7 @@ const Discover = () => {
         };
 
         fetchDiscoverShows();
-    }, [API_BASE_URL]);
+    }, [API_BASE_URL, apiKey]);
 
     return (
         <div className="discover-page">

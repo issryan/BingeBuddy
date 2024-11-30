@@ -8,14 +8,13 @@ const Profile = () => {
     const [watchlist, setWatchlist] = useState([]);
     const [availableUsers, setAvailableUsers] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [updatedUsername, setUpdatedUsername] = useState(false);
     const [updatedOldPassword, setUpdatedOldPassword] = useState(''); 
     const [updatedNewPassword, setUpdatedNewPassword] = useState(''); 
     const [updatedConfirmPassword, setUpdatedConfirmPassword] = useState(''); 
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const apiKey = process.env.REACT_APP_API_KEY;
+    const API_KEY = process.env.REACT_APP_API_KEY;
 
     useEffect(() => {
         fetchProfileData();
@@ -26,9 +25,8 @@ const Profile = () => {
     const fetchProfileData = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/users/profile`, {
+            const response = await axios.get(`${API_BASE_URL}/users/profile?apikey=${API_KEY}`, {
                 headers: { Authorization: `Bearer ${token}` },
-                params: { q: query, apikey: apiKey }
             });
             setProfileData({
                 ...response.data,
@@ -44,7 +42,7 @@ const Profile = () => {
     const fetchWatchlist = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/watchlist`, {
+            const response = await axios.get(`${API_BASE_URL}/watchlist?apikey=${API_KEY}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setWatchlist(response.data.slice(0, 5)); // Only display the top 5 shows
@@ -56,7 +54,7 @@ const Profile = () => {
     const fetchAvailableUsers = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/users/users`, {
+            const response = await axios.get(`${API_BASE_URL}/users/users?apikey=${API_KEY}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setAvailableUsers(response.data);
@@ -69,7 +67,7 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.post(
-                `${API_BASE_URL}/users/follow`,
+                `${API_BASE_URL}/users/follow?apikey=${API_KEY}`,
                 { followedEmail },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -90,7 +88,7 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.post(
-                `${API_BASE_URL}/users/unfollow`,
+                `${API_BASE_URL}/users/unfollow?apikey=${API_KEY}`,
                 { followedEmail: unfollowedEmail },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -111,11 +109,11 @@ const Profile = () => {
         if (window.confirm('Are you sure you want to delete your account? This action is irreversible.')) {
             try {
                 const token = localStorage.getItem('token');
-                await axios.delete(`${API_BASE_URL}/users/delete`, {
+                await axios.delete(`${API_BASE_URL}/users/delete?apikey=${API_KEY}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 alert('Your account has been deleted.');
-                handleLogout(); // Logout user after deletion
+                navigate('/'); // Redirect to home after deletion
             } catch (error) {
                 console.error('Error deleting user:', error);
                 alert('Failed to delete account. Please try again.');
@@ -125,9 +123,9 @@ const Profile = () => {
 
     const openEditModal = () => {
         setIsEditModalOpen(true);
-        setUpdatedOldPassword(''); // Clear old password input
-        setUpdatedNewPassword(''); // Clear new password input
-        setUpdatedConfirmPassword(''); // Clear confirm password input
+        setUpdatedOldPassword('');
+        setUpdatedNewPassword('');
+        setUpdatedConfirmPassword('');
     };
 
     const closeEditModal = () => {
@@ -143,16 +141,16 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.patch(
-                `${API_BASE_URL}/users/update-profile`,
+                `${API_BASE_URL}/users/update-profile?apikey=${API_KEY}`,
                 {
                     oldPassword: updatedOldPassword,
                     newPassword: updatedNewPassword,
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert(response.data.message); // Notify user of success
-            closeEditModal(); // Close the modal
-            fetchProfileData(); // Refresh profile data
+            alert(response.data.message);
+            closeEditModal();
+            fetchProfileData();
         } catch (error) {
             console.error('Error updating profile:', error);
             alert(error.response?.data?.message || 'Failed to update profile. Please try again.');
@@ -160,7 +158,7 @@ const Profile = () => {
     };
 
     const handleViewFullWatchlist = () => {
-        navigate('/watchlist'); // Redirect to the watchlist page
+        navigate('/watchlist');
     };
 
     return (

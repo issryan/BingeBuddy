@@ -19,10 +19,8 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
     const fetchWatchlist = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/watchlist`, {
+            const response = await axios.get(`${API_BASE_URL}/watchlist?apikey=${apiKey}`, {
                 headers: { Authorization: `Bearer ${token}` },
-                params: { apikey: apiKey },
-
             });
 
             const items = response.data;
@@ -62,7 +60,7 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
                 const email = localStorage.getItem('email');
 
                 await axios.post(
-                    `${API_BASE_URL}/watchlist/compare`,
+                    `${API_BASE_URL}/watchlist/compare?apikey=${apiKey}`,
                     {
                         email,
                         newShow,
@@ -87,7 +85,7 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
 
     useEffect(() => {
         fetchWatchlist();
-    }, []);
+    }, [API_BASE_URL, apiKey]);
 
     if (!newShow) {
         return <p>Error: No new show selected.</p>;
@@ -113,7 +111,7 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
                 <button
                     onClick={async () => {
                         try {
-                            await axios.post(`${API_BASE_URL}/watchlist`, payload, {
+                            await axios.post(`${API_BASE_URL}/watchlist?apikey=${apiKey}`, payload, {
                                 headers: { Authorization: `Bearer ${token}` },
                             });
                             alert(`${newShow.name} has been added to your watchlist!`);
