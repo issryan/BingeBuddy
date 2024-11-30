@@ -1,0 +1,89 @@
+/* Home Page Styles */
+.home-page {
+    font-family: 'Arial', sans-serif;
+    background-color: #1c1c1e;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.home-header {
+    margin-bottom: 20px;
+}
+
+.home-header h1 {
+     color: #ff4500; /* Softer orange */
+    font-size: 1.8rem;
+    font-weight: 700; /* Bold for emphasis */
+    text-decoration: none;
+    letter-spacing: 1.5px;
+    font-family: 'futura', cursive; /* Elegant logo font */
+    transition: color 0.3s ease;
+}
+
+.home-header p {
+    font-size: 1.2rem;
+    color: #bbb;
+}
+
+.home-content {
+    max-width: 600px;
+    margin-bottom: 30px;
+}
+
+.home-content p {
+    font-size: 1rem;
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.home-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.sign-in-button,
+.sign-up-button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sign-in-button {
+    background-color: #ff4500;
+    color: #fff;
+}
+
+.sign-in-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.sign-up-button {
+    background-color: #03dac6;
+    color: #000;
+}
+
+.sign-up-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.home-footer {
+    margin-top: 40px;
+}
+
+.home-footer p {
+    font-size: 1rem;
+    color: #aaa;
+}

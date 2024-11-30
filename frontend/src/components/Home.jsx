@@ -1,45 +1,33 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import './Home.css';
 
 const Home = () => {
     const navigate = useNavigate();
 
     return (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-            <h1>Welcome to BingeBuddy!</h1>
-            <p>
-                Discover, track, and rate your favorite TV shows. Organize your watchlist and
-                keep track of the shows you've watched or plan to watch. Join now and
-                elevate your TV viewing experience!
-            </p>
-            <button
-                onClick={() => navigate('/login')}
-                style={{
-                    margin: '10px',
-                    padding: '10px 20px',
-                    backgroundColor: '#6200EE',
-                    color: 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    borderRadius: '5px',
-                }}
-            >
-                Sign In
-            </button>
-            <button
-                onClick={() => navigate('/register')}
-                style={{
-                    margin: '10px',
-                    padding: '10px 20px',
-                    backgroundColor: '#03DAC6',
-                    color: 'black',
-                    border: 'none',
-                    cursor: 'pointer',
-                    borderRadius: '5px',
-                }}
-            >
-                Sign Up
-            </button>
+        <div className="home-page">
+            <header className="home-header">
+                <h1>BingeBuddy</h1>
+                <p>Your Ultimate TV Show Companion</p>
+            </header>
+            <div className="home-content">
+                <p>
+                    Discover, track, and rate your favorite TV shows. Organize your watchlist
+                    and never miss an episode. Join now and take your TV viewing experience to the next level!
+                </p>
+                <div className="home-buttons">
+                    <button className="sign-in-button" onClick={() => navigate('/login')}>
+                        Sign In
+                    </button>
+                    <button className="sign-up-button" onClick={() => navigate('/register')}>
+                        Sign Up
+                    </button>
+                </div>
+            </div>
+            <div className="home-footer">
+                <p>Start your journey with BingeBuddy today!</p>
+            </div>
         </div>
     );
 };
