@@ -25,7 +25,7 @@ const Login = () => {
 
             setErrorMessage('');
             alert('Login successful! Redirecting to your watchlist...');
-            navigate('/search');
+            navigate('/discover');
         } catch (error) {
             setErrorMessage(error.response?.data?.message || 'Error logging in');
         }

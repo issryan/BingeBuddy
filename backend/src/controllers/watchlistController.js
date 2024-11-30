@@ -1,5 +1,6 @@
 const WatchlistRepository = require('../repositories/watchlistRepository');
 const WatchlistDTO = require('../dtos/watchlistDTO');
+const axios = require('axios');
 
 // Add a show to the watchlist
 exports.addShow = async (req, res) => {
@@ -102,5 +103,30 @@ exports.compareShow = async (req, res) => {
     } catch (err) {
         console.error('Error during ranking:', err.message);
         res.status(500).json({ message: 'Failed to rank show', error: err.message });
+    }
+};
+
+
+// Fetch trending/global shows
+const fetchTrendingShows = async (filters = {}) => {
+    const params = { api_key: process.env.TMDB_API_KEY, ...filters };
+    const response = await axios.get('https://api.themoviedb.org/3/trending/all/day', { params });
+    return response.data.results.map((show) => ({
+        id: show.id,
+        title: show.title || show.name,
+        description: show.overview,
+        poster: `https://image.tmdb.org/t/p/w500${show.poster_path}`,
+        rating: show.vote_average,
+    }));
+};
+
+// Controller function to get discoverable shows
+exports.getDiscoverShows = async (req, res) => {
+    try {
+        const trendingShows = await fetchTrendingShows();
+        res.status(200).json(trendingShows);
+    } catch (err) {
+        console.error('Error fetching discover shows:', err.message);
+        res.status(500).json({ message: 'Error fetching discover shows', error: err.message });
     }
 };

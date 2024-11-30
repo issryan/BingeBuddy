@@ -8,6 +8,7 @@ import Register from './components/Register';
 import Home from './components/Home';
 import Navbar from './components/Navbar';
 import Profile from './components/Profile';
+import Discover from './components/Discover';
 
 const App = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -29,9 +30,12 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/discover" element={<Discover />} />
                 <Route path="/search" element={<Search searchQuery={searchQuery} />} />
                 <Route path="/watchlist" element={<Watchlist />} />
                 <Route path="/show/:id" element={<ShowDetails />} />
+                <Route path="*" element={<h1>Page not found</h1>} />
+
             </Routes>
         </>
     );
