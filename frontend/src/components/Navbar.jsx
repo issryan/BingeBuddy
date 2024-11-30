@@ -9,7 +9,7 @@ const Navbar = ({ onSearch }) => {
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         if (query.trim() === '') return;
-        onSearch(query); 
+        onSearch(query);
         navigate('/search');
     };
 
@@ -21,11 +21,10 @@ const Navbar = ({ onSearch }) => {
             <form className="navbar-search" onSubmit={handleSearchSubmit}>
                 <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder="Search for shows..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
-                <button type="submit">🔍</button>
             </form>
             <ul className="navbar-links">
                 <li>

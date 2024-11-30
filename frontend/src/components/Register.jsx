@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './Auth.css'; 
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -39,56 +40,57 @@ const Register = () => {
     };
 
     return (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-            <h1>Sign Up</h1>
-            <form onSubmit={handleRegister}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Sign Up</button>
-            </form>
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-            {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-            <p>
-                Already have an account?{' '}
-                <button
-                    style={{
-                        color: 'blue',
-                        textDecoration: 'underline',
-                        border: 'none',
-                        background: 'none',
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => navigate('/login')}
-                >
-                    Log In
-                </button>
-            </p>
+        <div className="auth-container">
+            <div className="auth-box">
+                <h1 className="auth-title">Register</h1>
+                <p className="auth-subtitle">New here? Create an account.</p>
+                <form onSubmit={handleRegister} className="auth-form">
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="auth-input"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                        className="auth-input"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="auth-input"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        className="auth-input"
+                    />
+                    <button type="submit" className="auth-button">Register</button>
+                </form>
+                {errorMessage && <p className="auth-error">{errorMessage}</p>}
+                {successMessage && <p className="auth-success">{successMessage}</p>}
+                <p className="auth-footer">
+                    Already have an account?{' '}
+                    <span
+                        className="auth-link"
+                        onClick={() => navigate('/login')}
+                    >
+                        Log In
+                    </span>
+                </p>
+            </div>
         </div>
     );
 };

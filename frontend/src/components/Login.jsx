@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './Auth.css'; // Shared styles with Register
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -31,41 +32,40 @@ const Login = () => {
     };
 
     return (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-            <h1>Login</h1>
-            <form onSubmit={handleLogin}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Login</button>
-            </form>
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-            <p>
-                Don’t have an account?{' '}
-                <button
-                    style={{
-                        color: 'blue',
-                        textDecoration: 'underline',
-                        border: 'none',
-                        background: 'none',
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => navigate('/register')}
-                >
-                    Sign Up
-                </button>
-            </p>
+        <div className="auth-container">
+            <div className="auth-box">
+                <h1 className="auth-title">Login</h1>
+                <p className="auth-subtitle">Welcome back! Please login to your account.</p>
+                <form onSubmit={handleLogin} className="auth-form">
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="auth-input"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="auth-input"
+                    />
+                    <button type="submit" className="auth-button">Login</button>
+                </form>
+                {errorMessage && <p className="auth-error">{errorMessage}</p>}
+                <p className="auth-footer">
+                    Don’t have an account?{' '}
+                    <span
+                        className="auth-link"
+                        onClick={() => navigate('/register')}
+                    >
+                        Sign Up
+                    </span>
+                </p>
+            </div>
         </div>
     );
 };

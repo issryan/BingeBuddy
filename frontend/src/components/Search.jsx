@@ -55,15 +55,6 @@ const Search = ({ searchQuery }) => {
 
     return (
         <div className="search-page">
-            <form onSubmit={handleSearch} className="search-bar">
-                <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search for a show..."
-                />
-                <button type="submit">Search</button>
-            </form>
             {error && <p className="error">{error}</p>}
             <ul className="search-results">
                 {results.map((show) => (
