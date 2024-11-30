@@ -2,7 +2,6 @@
   "name": "bingebuddy-frontend",
   "version": "1.0.0",
   "private": true,
-  "proxy": "https://34.8.46.85.nip.io/bingebuddy",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

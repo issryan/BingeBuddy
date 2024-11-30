@@ -12,7 +12,6 @@ const Search = ({ searchQuery }) => {
     const [selectedShow, setSelectedShow] = useState(null);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const API_KEY = process.env.REACT_APP_API_KEY;
 
     // Fetch search results
     const fetchSearchResults = async (query) => {

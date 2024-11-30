@@ -10,7 +10,6 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
     const [watchlist, setWatchlist] = useState([]);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const apiKey = process.env.REACT_APP_API_KEY;
 
     if (!API_BASE_URL) {
         console.error("API_BASE_URL is not defined in the .env file.");

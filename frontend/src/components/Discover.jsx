@@ -6,8 +6,6 @@ const Discover = () => {
     const [shows, setShows] = useState([]);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const apiKey = process.env.REACT_APP_API_KEY;
-
 
     if (!API_BASE_URL) {
         console.error("API_BASE_URL is not defined in the .env file.");
@@ -20,7 +18,7 @@ const Discover = () => {
     useEffect(() => {
         const fetchDiscoverShows = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/watchlist/discover?apikey=${apiKey}`);
+                const response = await axios.get(`${API_BASE_URL}/watchlist/discover`);
                 setShows(response.data);
             } catch (err) {
                 console.error('Error fetching discover shows:', err);

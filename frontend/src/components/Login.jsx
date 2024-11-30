@@ -10,7 +10,6 @@ const Login = () => {
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const API_KEY = process.env.REACT_APP_API_KEY;
 
     if (!API_BASE_URL) {
         console.error("API_BASE_URL is not defined in the .env file.");
@@ -23,13 +22,10 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post(
-                `${API_BASE_URL}/auth/login?apikey=${API_KEY}`,
-                {
-                    email,
-                    password,
-                }
-            );
+            const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+                email,
+                password,
+            });
 
             // Save token and other details to localStorage
             localStorage.setItem('token', response.data.token);

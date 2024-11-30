@@ -14,7 +14,7 @@ const Profile = () => {
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const API_KEY = process.env.REACT_APP_API_KEY;
+    const apiKey = process.env.REACT_APP_API_KEY;
 
     useEffect(() => {
         fetchProfileData();
