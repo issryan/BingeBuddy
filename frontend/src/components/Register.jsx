@@ -13,6 +13,7 @@ const Register = () => {
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const apiKey = process.env.REACT_APP_API_KEY;
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -27,6 +28,7 @@ const Register = () => {
                 email,
                 username,
                 password,
+                params: { q: query, apikey: apiKey }
             });
 
             setSuccessMessage('Registration successful! You can now log in.');

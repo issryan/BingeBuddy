@@ -11,13 +11,14 @@ const Watchlist = () => {
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const apiKey = process.env.REACT_APP_API_KEY;
 
     useEffect(() => {
         const fetchWatchlist = async () => {
             try {
                 const token = localStorage.getItem('token');
                 const response = await axios.get(`${API_BASE_URL}/watchlist`, {
-                    headers: { Authorization: `Bearer ${token}` },
+                    params: { apikey: apiKey },
                 });
                 setWatchlist(response.data);
             } catch (err) {
