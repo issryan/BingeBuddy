@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const UserRepository = require('../repositories/userRepository');
 const WatchlistRepository = require('../repositories/watchlistRepository');
 const FollowRepository = require('../repositories/followRepository');

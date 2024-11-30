@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserRepository = require('../repositories/userRepository');
 const { UserRegisterDTO, UserLoginDTO } = require('../dtos/userDTO');
