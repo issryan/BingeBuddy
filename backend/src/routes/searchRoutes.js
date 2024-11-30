@@ -7,8 +7,8 @@ const router = express.Router();
 router.get('/search', authenticateToken, async (req, res) => {
     const query = req.query.q;
 
-    console.log('Query received:', query); // Debug log
-    console.log('Authenticated user:', req.user); // Debug log
+    console.log('Query received:', query);
+    console.log('Authenticated user:', req.user); 
 
     if (!query) {
         return res.status(400).json({ message: 'Search query is required' });
