@@ -33,10 +33,10 @@ const Navbar = ({ onSearch }) => {
             </form>
             <ul className="navbar-links">
                 <li>
-                    <Link to="/watchlist">My Shows</Link>
+                    <Link to="/discover">Discover</Link>
                 </li>
                 <li>
-                    <Link to="/discover">Discover</Link>
+                    <Link to="/watchlist">My Shows</Link>
                 </li>
                 <li>
                     <Link to="/profile">Profile</Link>
