@@ -12,6 +12,8 @@ const Watchlist = () => {
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_KEY = process.env.REACT_APP_API_KEY;
+
 
     if (!API_BASE_URL) {
         console.error("API_BASE_URL is not defined in the environment variables.");
@@ -29,6 +31,7 @@ const Watchlist = () => {
 
                 const response = await axios.get(`${API_BASE_URL}/watchlist`, {
                     headers: { Authorization: `Bearer ${token}` },
+                    params: { apikey: API_KEY },
                 });
                 setWatchlist(response.data);
             } catch (err) {
@@ -40,7 +43,7 @@ const Watchlist = () => {
         };
 
         fetchWatchlist();
-    }, [API_BASE_URL]);
+    }, [API_BASE_URL, API_KEY]);
 
     const handleDelete = async (showId) => {
         try {
@@ -52,6 +55,7 @@ const Watchlist = () => {
 
             await axios.delete(`${API_BASE_URL}/watchlist/${showId}`, {
                 headers: { Authorization: `Bearer ${token}` },
+                params: { apikey: API_KEY },
             });
 
             // Update the watchlist after deletion
