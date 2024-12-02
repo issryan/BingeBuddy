@@ -8,31 +8,49 @@ import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 const Watchlist = () => {
     const [watchlist, setWatchlist] = useState([]);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+    if (!API_BASE_URL) {
+        console.error("API_BASE_URL is not defined in the environment variables.");
+    }
 
     useEffect(() => {
         const fetchWatchlist = async () => {
             try {
                 const token = localStorage.getItem('token');
+                if (!token) {
+                    setError('You must be logged in to view your watchlist.');
+                    setLoading(false);
+                    return;
+                }
+
                 const response = await axios.get(`${API_BASE_URL}/watchlist`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setWatchlist(response.data);
             } catch (err) {
                 console.error('Error fetching watchlist:', err.response?.data || err.message);
-                setError('Failed to fetch watchlist. Please try again.');
+                setError('Failed to fetch watchlist. Please try again later.');
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchWatchlist();
-    }, [API_BASE_URL, API_KEY]);
+    }, [API_BASE_URL]);
 
     const handleDelete = async (showId) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`${API_BASE_URL}/watchlist/${showId}?apikey=${API_KEY}`, {
+            if (!token) {
+                alert('You must be logged in to perform this action.');
+                return;
+            }
+
+            await axios.delete(`${API_BASE_URL}/watchlist/${showId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -48,6 +66,10 @@ const Watchlist = () => {
     const handleShowDetails = (showId) => {
         navigate(`/show/${showId}`); // Navigate to the details page
     };
+
+    if (loading) {
+        return <p className="watchlist-loading">Loading your watchlist...</p>;
+    }
 
     return (
         <div className="watchlist-page">
@@ -81,6 +103,9 @@ const Watchlist = () => {
                     </div>
                 ))}
             </div>
+            {watchlist.length === 0 && !loading && !error && (
+                <p className="watchlist-empty">Your watchlist is currently empty.</p>
+            )}
         </div>
     );
 };

@@ -13,6 +13,14 @@ const Register = () => {
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_KEY = process.env.REACT_APP_API_KEY;
+
+    if (!API_BASE_URL) {
+        console.error("API_BASE_URL is not defined in the .env file.");
+    }
+    if (!API_KEY) {
+        console.error("API_KEY is not defined in the .env file.");
+    }
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -23,11 +31,11 @@ const Register = () => {
         }
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/auth/register?apikey=${API_KEY}`, {
-                email,
-                username,
-                password,
-            });
+            const response = await axios.post(
+                `${API_BASE_URL}/auth/register`,
+                { email, username, password },
+                { params: { apikey: API_KEY } } 
+            );
 
             setSuccessMessage('Registration successful! You can now log in.');
             setErrorMessage('');

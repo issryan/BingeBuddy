@@ -12,14 +12,22 @@ const Search = ({ searchQuery }) => {
     const [selectedShow, setSelectedShow] = useState(null);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_KEY = process.env.REACT_APP_API_KEY;
+
+    if (!API_BASE_URL) {
+        console.error("API_BASE_URL is not defined in the .env file.");
+    }
+    if (!API_KEY) {
+        console.error("API_KEY is not defined in the .env file.");
+    }
 
     // Fetch search results
     const fetchSearchResults = async (query) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/search/search?apikey=${API_KEY}`, {
+            const response = await axios.get(`${API_BASE_URL}/search/search`, {
                 headers: { Authorization: `Bearer ${token}` },
-                params: { q: query },
+                params: { q: query, apikey: API_KEY },
             });
 
             setResults(response.data);

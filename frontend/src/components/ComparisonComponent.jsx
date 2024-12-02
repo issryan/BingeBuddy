@@ -10,16 +10,22 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
     const [watchlist, setWatchlist] = useState([]);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_KEY = process.env.REACT_APP_API_KEY;
 
     if (!API_BASE_URL) {
         console.error("API_BASE_URL is not defined in the .env file.");
     }
 
+    if (!API_KEY) {
+        console.error("REACT_APP_API_KEY is not defined in the .env file.");
+    }
+
     const fetchWatchlist = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/watchlist?apikey=${apiKey}`, {
+            const response = await axios.get(`${API_BASE_URL}/watchlist`, {
                 headers: { Authorization: `Bearer ${token}` },
+                params: { apikey: API_KEY },
             });
 
             const items = response.data;
@@ -59,14 +65,14 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
                 const email = localStorage.getItem('email');
 
                 await axios.post(
-                    `${API_BASE_URL}/watchlist/compare?apikey=${apiKey}`,
+                    `${API_BASE_URL}/watchlist/compare`,
                     {
                         email,
                         newShow,
                         comparisonShowId: comparisonShow.showId,
                         preference,
                     },
-                    { headers: { Authorization: `Bearer ${token}` } }
+                    { headers: { Authorization: `Bearer ${token}` }, params: { apikey: API_KEY } }
                 );
 
                 alert(`${newShow.name} has been added to your watchlist!`);
@@ -84,7 +90,7 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
 
     useEffect(() => {
         fetchWatchlist();
-    }, [API_BASE_URL, apiKey]);
+    }, []);
 
     if (!newShow) {
         return <p>Error: No new show selected.</p>;
@@ -110,8 +116,9 @@ const ComparisonComponent = ({ newShow, onRankingComplete }) => {
                 <button
                     onClick={async () => {
                         try {
-                            await axios.post(`${API_BASE_URL}/watchlist?apikey=${apiKey}`, payload, {
+                            await axios.post(`${API_BASE_URL}/watchlist`, payload, {
                                 headers: { Authorization: `Bearer ${token}` },
+                                params: { apikey: API_KEY },
                             });
                             alert(`${newShow.name} has been added to your watchlist!`);
                             onRankingComplete();

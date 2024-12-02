@@ -8,13 +8,20 @@ const Profile = () => {
     const [watchlist, setWatchlist] = useState([]);
     const [availableUsers, setAvailableUsers] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [updatedOldPassword, setUpdatedOldPassword] = useState(''); 
-    const [updatedNewPassword, setUpdatedNewPassword] = useState(''); 
-    const [updatedConfirmPassword, setUpdatedConfirmPassword] = useState(''); 
+    const [updatedOldPassword, setUpdatedOldPassword] = useState('');
+    const [updatedNewPassword, setUpdatedNewPassword] = useState('');
+    const [updatedConfirmPassword, setUpdatedConfirmPassword] = useState('');
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const apiKey = process.env.REACT_APP_API_KEY;
+    const API_KEY = process.env.REACT_APP_API_KEY;
+
+    if (!API_BASE_URL) {
+        console.error("API_BASE_URL is not defined in the .env file.");
+    }
+    if (!API_KEY) {
+        console.error("API_KEY is not defined in the .env file.");
+    }
 
     useEffect(() => {
         fetchProfileData();
@@ -25,8 +32,9 @@ const Profile = () => {
     const fetchProfileData = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/users/profile?apikey=${API_KEY}`, {
+            const response = await axios.get(`${API_BASE_URL}/users/profile`, {
                 headers: { Authorization: `Bearer ${token}` },
+                params: { apikey: API_KEY },
             });
             setProfileData({
                 ...response.data,
@@ -42,8 +50,9 @@ const Profile = () => {
     const fetchWatchlist = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/watchlist?apikey=${API_KEY}`, {
+            const response = await axios.get(`${API_BASE_URL}/watchlist`, {
                 headers: { Authorization: `Bearer ${token}` },
+                params: { apikey: API_KEY },
             });
             setWatchlist(response.data.slice(0, 5)); // Only display the top 5 shows
         } catch (error) {
@@ -54,8 +63,9 @@ const Profile = () => {
     const fetchAvailableUsers = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/users/users?apikey=${API_KEY}`, {
+            const response = await axios.get(`${API_BASE_URL}/users/users`, {
                 headers: { Authorization: `Bearer ${token}` },
+                params: { apikey: API_KEY },
             });
             setAvailableUsers(response.data);
         } catch (error) {
@@ -67,16 +77,17 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.post(
-                `${API_BASE_URL}/users/follow?apikey=${API_KEY}`,
+                `${API_BASE_URL}/users/follow`,
                 { followedEmail },
-                { headers: { Authorization: `Bearer ${token}` } }
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                    params: { apikey: API_KEY },
+                }
             );
 
             setProfileData((prev) => ({
                 ...prev,
-                following: Array.isArray(prev.following)
-                    ? [...prev.following, followedEmail]
-                    : [followedEmail],
+                following: [...prev.following, followedEmail],
             }));
         } catch (error) {
             console.error('Error following user:', error);
@@ -88,9 +99,12 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.post(
-                `${API_BASE_URL}/users/unfollow?apikey=${API_KEY}`,
+                `${API_BASE_URL}/users/unfollow`,
                 { followedEmail: unfollowedEmail },
-                { headers: { Authorization: `Bearer ${token}` } }
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                    params: { apikey: API_KEY },
+                }
             );
 
             setProfileData((prev) => ({
@@ -109,11 +123,12 @@ const Profile = () => {
         if (window.confirm('Are you sure you want to delete your account? This action is irreversible.')) {
             try {
                 const token = localStorage.getItem('token');
-                await axios.delete(`${API_BASE_URL}/users/delete?apikey=${API_KEY}`, {
+                await axios.delete(`${API_BASE_URL}/users/delete`, {
                     headers: { Authorization: `Bearer ${token}` },
+                    params: { apikey: API_KEY },
                 });
                 alert('Your account has been deleted.');
-                navigate('/'); // Redirect to home after deletion
+                navigate('/');
             } catch (error) {
                 console.error('Error deleting user:', error);
                 alert('Failed to delete account. Please try again.');
@@ -141,12 +156,12 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.patch(
-                `${API_BASE_URL}/users/update-profile?apikey=${API_KEY}`,
+                `${API_BASE_URL}/users/update-profile`,
+                { oldPassword: updatedOldPassword, newPassword: updatedNewPassword },
                 {
-                    oldPassword: updatedOldPassword,
-                    newPassword: updatedNewPassword,
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
+                    headers: { Authorization: `Bearer ${token}` },
+                    params: { apikey: API_KEY },
+                }
             );
             alert(response.data.message);
             closeEditModal();
