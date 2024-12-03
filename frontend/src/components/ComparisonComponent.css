@@ -1,25 +1,48 @@
-.comparison-modal {
-    text-align: center;
-    padding: 30px 20px;
-    background-color: #1c1c1c;
-    color: #f5f5f5;
-    font-family: 'Arial', sans-serif;
+.ReactModal__Overlay {
+    background-color: rgba(0, 0, 0, 0.8) !important; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; 
+
+.ReactModal__Content {
+    background-color: #1c1c1c; 
+    color: #f5f5f5; 
+    padding: 30px;
     border-radius: 15px;
-    max-width: 600px;
-    margin: auto;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000; 
+    border: none;
+    outline: none;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+    animation: fadeIn 0.3s ease-in-out;
+    position: relative; 
+}
+
+button {
+    background-color: #ff4500; 
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+button:hover {
+    background-color: #ff5722; 
+    transform: scale(1.05); 
 }
 
 h2 {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-size: 24px;
+    font-weight: bold;
     color: #ffffff;
-    text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+    text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); 
 }
 
 .comparison-container {
@@ -32,67 +55,48 @@ h2 {
 
 .comparison-box {
     cursor: pointer;
-    padding: 15px;
-    border: 3px solid #ff4500;
+    padding: 20px;
+    border: 2px solid #ff4500;
     border-radius: 10px;
     text-align: center;
-    width: 48%;
+    width: 45%;
     background-color: #2b2b2b;
-    transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    transition: transform 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
 .comparison-box:hover {
     transform: scale(1.05);
-    border-color: #ff5722;
+    border-color: #ff5722; 
 }
 
 .comparison-poster {
     width: 100%;
     border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); 
 }
 
 .comparison-or {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     color: #cccccc;
+    margin: 0 10px;
     text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
-    align-self: center;
 }
 
 .loading-text {
     margin-top: 15px;
     font-size: 16px;
     color: #ff4500;
+    font-weight: bold;
 }
 
-body {
-    background-color: #121212; 
-    margin: 0; 
-}
-
-.ReactModal__Overlay {
-    background-color: rgba(0, 0, 0, 0.7) !important; 
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 999; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.ReactModal__Content {
-    position: relative;
-    background-color: #1c1c1c;
-    border: none;
-    border-radius: 15px;
-    max-width: 600px;
-    width: 90%;
-    padding: 20px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    overflow: auto;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9); 
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
