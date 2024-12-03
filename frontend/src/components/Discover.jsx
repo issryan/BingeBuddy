@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Modal from 'react-modal';
+import ComparisonComponent from './ComparisonComponent';
 import './Discover.css';
 
 const Discover = () => {
     const [shows, setShows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedShow, setSelectedShow] = useState(null);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
     const API_KEY = process.env.REACT_APP_API_KEY;
@@ -36,6 +40,16 @@ const Discover = () => {
         fetchDiscoverShows();
     }, [API_BASE_URL, API_KEY]);
 
+    const openModal = (show) => {
+        setSelectedShow(show);
+        setModalIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setSelectedShow(null);
+    };
+
     if (loading) {
         return <p className="loading-message">Loading trending shows...</p>;
     }
@@ -61,11 +75,30 @@ const Discover = () => {
                         <p className="discover-description">{show.description}</p>
                         <p className="rating">Rating: {show.rating}/10</p>
                         <div className="discover-actions">
-                            <button className="add-to-watchlist-button">Add to Watchlist</button>
+                            <button
+                                className="add-to-watchlist-button"
+                                onClick={() => openModal(show)}
+                            >
+                                Add to Watchlist
+                            </button>
                         </div>
                     </div>
                 ))}
             </div>
+
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
+                {selectedShow ? (
+                    <ComparisonComponent
+                        newShow={selectedShow}
+                        onRankingComplete={() => {
+                            alert(`${selectedShow.title} successfully added and ranked!`);
+                            closeModal();
+                        }}
+                    />
+                ) : (
+                    <p>Loading...</p>
+                )}
+            </Modal>
         </div>
     );
 };
