@@ -1,65 +1,41 @@
-const dynamoDb = require('../utils/db');
+const User = require('../models/User');
 
 const UserRepository = {
     // Create a new user
     create: async (user) => {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Item: user,
-        };
-        await dynamoDb.put(params).promise();
+        const newUser = new User(user);
+        return await newUser.save();
     },
 
     // Find a user by email
     findByEmail: async (email) => {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email },
-        };
-        const result = await dynamoDb.get(params).promise();
-        return result.Item || null;
+        return await User.findOne({ email });
     },
 
     // Get friends of a user
     getFriends: async (userEmail) => {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email: userEmail },
-        };
-        const result = await dynamoDb.get(params).promise();
-        return result.Item?.friends?.values || [];
+        const user = await User.findOne({ email: userEmail });
+        return user?.friends || [];
     },
 
     // Update user's password
     updatePassword: async (email, hashedPassword) => {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email },
-            UpdateExpression: 'SET password = :password',
-            ExpressionAttributeValues: { ':password': hashedPassword },
-        };
-        await dynamoDb.update(params).promise();
+        return await User.findOneAndUpdate(
+            { email },
+            { password: hashedPassword },
+            { new: true }
+        );
     },
 
     // Delete a user
     deleteUser: async (email) => {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            Key: { email },
-        };
-        await dynamoDb.delete(params).promise();
+        return await User.findOneAndDelete({ email });
     },
 
     // Get all users except the current user
     getAvailableUsers: async (currentUserEmail) => {
-        const params = {
-            TableName: process.env.USERS_TABLE,
-            FilterExpression: 'email <> :email',
-            ExpressionAttributeValues: { ':email': currentUserEmail },
-        };
-        const result = await dynamoDb.scan(params).promise();
-        return result.Items || [];
-    },
+        return await User.find({ email: { $ne: currentUserEmail } });
+    }
 };
 
 module.exports = UserRepository;

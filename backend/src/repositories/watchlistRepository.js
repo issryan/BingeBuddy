@@ -1,54 +1,32 @@
-const dynamoDb = require('../utils/db');
+const Watchlist = require('../models/Watchlist');
 const WatchlistDTO = require('../dtos/watchlistDTO');
 const axios = require('axios');
 
 const WatchlistRepository = {
     addShow: async (show) => {
-        const params = {
-            TableName: process.env.WATCHLIST_TABLE,
-            Item: WatchlistDTO.toDatabase(show),
-        };
-        await dynamoDb.put(params).promise();
+        const watchlistItem = new Watchlist(WatchlistDTO.toDatabase(show));
+        return await watchlistItem.save();
     },
 
     getShowsByUser: async (email) => {
-        const params = {
-            TableName: process.env.WATCHLIST_TABLE,
-            KeyConditionExpression: 'email = :email',
-            ExpressionAttributeValues: { ':email': email },
-        };
-        const result = await dynamoDb.query(params).promise();
-        return result.Items.map((item) => WatchlistDTO.fromDatabase(item)) 
-            .sort((a, b) => a.rank - b.rank);
+        const shows = await Watchlist.find({ email }).sort({ rank: 1 });
+        return shows.map(item => WatchlistDTO.fromDatabase(item));
     },
 
     countShowsByUser: async (email) => {
-        const params = {
-            TableName: process.env.WATCHLIST_TABLE,
-            KeyConditionExpression: 'email = :email',
-            ExpressionAttributeValues: { ':email': email },
-            Select: 'COUNT', // Only count items
-        };
-        const result = await dynamoDb.query(params).promise();
-        return result.Count; // Returns the number of items
+        return await Watchlist.countDocuments({ email });
     },
 
     updateShowRank: async (email, showId, rank) => {
-        const params = {
-            TableName: process.env.WATCHLIST_TABLE,
-            Key: { email, showId },
-            UpdateExpression: 'SET rank = :rank',
-            ExpressionAttributeValues: { ':rank': rank },
-        };
-        await dynamoDb.update(params).promise();
+        return await Watchlist.findOneAndUpdate(
+            { email, showId },
+            { rank },
+            { new: true }
+        );
     },
 
     removeShow: async (email, showId) => {
-        const params = {
-            TableName: process.env.WATCHLIST_TABLE,
-            Key: { email, showId },
-        };
-        await dynamoDb.delete(params).promise();
+        return await Watchlist.findOneAndDelete({ email, showId });
     },
 
     fetchTrendingShows: async () => {
@@ -61,7 +39,7 @@ const WatchlistRepository = {
             poster: `https://image.tmdb.org/t/p/w500${show.poster_path}`,
             rating: show.vote_average,
         }));
-    },
+    }
 };
 
 module.exports = WatchlistRepository;
