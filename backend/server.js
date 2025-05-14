@@ -18,7 +18,7 @@ app.use('/api/users', require('./src/routes/userRoutes'));
 app.use('/api/watchlist', require('./src/routes/watchlistRoutes'));
 app.use('/api/search', require('./src/routes/searchRoutes'));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4500;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
