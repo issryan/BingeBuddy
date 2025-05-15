@@ -18,7 +18,6 @@ const Profile = () => {
     const [profilePic, setProfilePic] = useState('https://via.placeholder.com/120');
     const [updatedProfilePic, setUpdatedProfilePic] = useState('');
     const [bioCharCount, setBioCharCount] = useState(0);
-    const fileInputRef = useRef(null);
     const modalFileInputRef = useRef(null);
     const navigate = useNavigate();
 
@@ -173,7 +172,6 @@ const Profile = () => {
         }
         try {
             const token = localStorage.getItem('token');
-            // Here you would also send updatedProfilePic to the backend if you support avatar uploads
             const response = await axios.patch(
                 `${API_BASE_URL}/users/update-profile`,
                 {
@@ -197,7 +195,6 @@ const Profile = () => {
         }
     };
 
-    // Handle avatar upload in modal
     const handleModalProfilePicChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -217,115 +214,87 @@ const Profile = () => {
 
     // Placeholder banner image
     const bannerUrl = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80';
-    const favoriteShows = watchlist.slice(0, 4);
-    const recentActivity = watchlist.slice(0, 4);
+    const favoriteShows = watchlist.slice(0, 5);
+
+    // Stats mockup
+    const stats = [
+        { label: 'Shows Watched', value: 150, sub: '+5% this month' },
+        { label: 'Genres Explored', value: 12, sub: '+2% this month' },
+        { label: 'Average Rating', value: 4.5, sub: '+0.1 this month' },
+        { label: 'Total Watch Time', value: '300h', sub: '+10h this month' },
+    ];
 
     return (
-        <div className="profile-page-dark">
-            {/* Banner */}
-            <div className="profile-banner" style={{ backgroundImage: `url(${bannerUrl})` }} />
-            {/* Overlapping avatar and info card */}
-            <div className="profile-info-card">
-                <div className="profile-info-avatar-wrap">
-                    <img
-                        className="profile-info-avatar"
-                        src={profilePic}
-                        alt={profileData.username || 'User Avatar'}
-                    />
+        <div className="profile-root profile-row-layout">
+            {/* Banner + Avatar + Friends Sidebar */}
+            <div className="profile-banner-row">
+                <div className="profile-banner" style={{ backgroundImage: `url(${bannerUrl})` }}>
+                    <img className="profile-banner-avatar" src={profilePic} alt={profileData.username || 'User Avatar'} />
                 </div>
-                <div className="profile-info-main">
-                    <div className="profile-info-header-row">
-                        <h2>{profileData.username || 'Username'}</h2>
-                        <button className="profile-info-settings-btn" onClick={openEditModal} title="Edit profile settings">
-                            Edit Profile
-                        </button>
-                    </div>
-                    <div className="profile-info-bio-row">
-                        <p className="profile-info-bio">{profileData.bio || 'Add a short bio about yourself.'}</p>
-                    </div>
-                    <div className="profile-info-stats-row">
-                        <div className="profile-info-stat"><strong>{profileData.followersCount || 0}</strong> Followers</div>
-                        <div className="profile-info-stat"><strong>{profileData.followingCount || 0}</strong> Following</div>
-                        <div className="profile-info-stat"><strong>{profileData.showsWatched || watchlist.length}</strong> Shows Watched</div>
-                    </div>
-                </div>
+                <aside className="profile-friends-sidebar">
+                    <h4>Friends</h4>
+                    <ul className="profile-friends-list-sidebar">
+                        {profileData.following && profileData.following.length > 0 ? (
+                            profileData.following.map((email) => {
+                                const user = availableUsers.find((u) => u.email === email);
+                                return (
+                                    <li key={email} className="profile-friend-sidebar-card">
+                                        <img src={user?.profilePic || 'https://via.placeholder.com/40'} alt={user?.username || email} />
+                                        <div className="profile-friend-sidebar-info">
+                                            <span className="profile-friend-sidebar-username">{user?.username || email}</span>
+                                            <span className="profile-friend-sidebar-handle">@{user?.username?.toLowerCase() || email.split('@')[0]}</span>
+                                        </div>
+                                        <button className="profile-friend-sidebar-visit">Visit</button>
+                                    </li>
+                                );
+                            })
+                        ) : (
+                            <li className="profile-friend-sidebar-card">No friends yet.</li>
+                        )}
+                    </ul>
+                </aside>
             </div>
-            {/* Tab bar */}
-            <div className="profile-tabs-bar">
-                <div className="profile-tab active">Profile</div>
-                <div className="profile-tab">Activity</div>
-                <div className="profile-tab">Watchlist</div>
-                <div className="profile-tab">Lists</div>
-            </div>
-            {/* Main content */}
-            <div className="profile-main-content">
-                <div className="profile-main-left">
-                    <div className="profile-section">
-                        <h3>Favorite Shows</h3>
-                        <div className="profile-favorites-grid">
-                            {favoriteShows.map((show) => (
-                                <div className="profile-favorite-card" key={show.showId}>
-                                    <img src={show.poster} alt={show.title} />
-                                    <div className="profile-favorite-title">{show.title}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="profile-section">
-                        <h3>Recent Activity</h3>
-                        <div className="profile-activity-grid">
-                            {recentActivity.map((show) => (
-                                <div className="profile-activity-card" key={show.showId}>
-                                    <img src={show.poster} alt={show.title} />
-                                    <div className="profile-activity-title">{show.title}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+            {/* Profile Info (centered below avatar) */}
+            <div className="profile-info">
+                <div className="profile-banner-username">
+                    {profileData.username || 'Username'} <span className="profile-banner-verified">✔️</span>
                 </div>
-                <div className="profile-main-right">
-                    <div className="profile-section">
-                        <h3>Following</h3>
-                        <ul className="profile-friends-list">
-                            {profileData.following && profileData.following.length > 0 ? (
-                                profileData.following.map((email) => {
-                                    const user = availableUsers.find((u) => u.email === email);
-                                    return (
-                                        <li key={email} className="profile-friend-card">
-                                            <span>{user?.username || email}</span>
-                                            <button onClick={() => handleUnfollowUser(email)}>Unfollow</button>
-                                        </li>
-                                    );
-                                })
-                            ) : (
-                                <li className="profile-friend-card">Not following anyone yet.</li>
-                            )}
-                        </ul>
+                <div className="profile-banner-handle">@{profileData.username?.toLowerCase() || 'username'}</div>
+                <div className="profile-banner-stats">
+                    <span><strong>{profileData.followersCount || 0}</strong> followers</span>
+                    <span><strong>{profileData.followingCount || 0}</strong> following</span>
+                </div>
+                <button className="profile-info-settings-btn" onClick={openEditModal} title="Edit profile settings">
+                    Edit Profile
+                </button>
+            </div>
+            {/* Stats Cards */}
+            <div className="profile-stats-cards-row">
+                {stats.map((stat, i) => (
+                    <div className="profile-stats-card" key={i}>
+                        <div className="profile-stats-card-value">{stat.value}</div>
+                        <div className="profile-stats-card-label">{stat.label}</div>
+                        <div className="profile-stats-card-sub">{stat.sub}</div>
                     </div>
-                    <div className="profile-section">
-                        <h3>Followers</h3>
-                        <ul className="profile-friends-list">
-                            {profileData.followers && profileData.followers.length > 0 ? (
-                                profileData.followers.map((email) => {
-                                    const user = availableUsers.find((u) => u.email === email);
-                                    const isFollowingBack = profileData.following?.includes(email);
-                                    return (
-                                        <li key={email} className="profile-friend-card">
-                                            <span>{user?.username || email}</span>
-                                            {!isFollowingBack && (
-                                                <button onClick={() => handleFollowUser(email)}>Follow Back</button>
-                                            )}
-                                        </li>
-                                    );
-                                })
-                            ) : (
-                                <li className="profile-friend-card">No followers yet.</li>
-                            )}
-                        </ul>
-                    </div>
-                    <button className="profile-delete-account-btn" onClick={handleDeleteUser}>
-                        Delete Account
-                    </button>
+                ))}
+            </div>
+            {/* Favorite Shows */}
+            <div className="profile-section">
+                <h3>Favorite Shows</h3>
+                <div className="profile-favorites-grid">
+                    {favoriteShows.map((show) => (
+                        <div className="profile-favorite-card" key={show.showId}>
+                            <img src={show.poster} alt={show.title} />
+                            <div className="profile-favorite-title">{show.title}</div>
+                            {show.genre || show.rating ? (
+                                <div className="profile-favorite-meta">
+                                    {show.genre && <span>{show.genre}</span>}
+                                    {show.genre && show.rating ? ' · ' : ''}
+                                    {show.rating && <span>{show.rating}</span>}
+                                </div>
+                            ) : null}
+                        </div>
+                    ))}
                 </div>
             </div>
             {/* Edit Modal */}
