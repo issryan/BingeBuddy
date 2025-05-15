@@ -216,20 +216,65 @@ const Profile = () => {
     const bannerUrl = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80';
     const favoriteShows = watchlist.slice(0, 5);
 
-    // Stats mockup
+    // Stats with all values set to 0
     const stats = [
-        { label: 'Shows Watched', value: 150, sub: '+5% this month' },
-        { label: 'Genres Explored', value: 12, sub: '+2% this month' },
-        { label: 'Average Rating', value: 4.5, sub: '+0.1 this month' },
-        { label: 'Total Watch Time', value: '300h', sub: '+10h this month' },
+        { label: 'Shows Watched', value: 0, sub: '+0% this month' },
+        { label: 'Genres Explored', value: 0, sub: '+0% this month' },
+        { label: 'Average Rating', value: 0.0, sub: '+0.0 this month' },
+        { label: 'Total Watch Time', value: '0h', sub: '+0h this month' },
     ];
 
     return (
-        <div className="profile-root profile-row-layout">
-            {/* Banner + Avatar + Friends Sidebar */}
-            <div className="profile-banner-row">
-                <div className="profile-banner" style={{ backgroundImage: `url(${bannerUrl})` }}>
-                    <img className="profile-banner-avatar" src={profilePic} alt={profileData.username || 'User Avatar'} />
+        <div className="profile-root">
+            {/* Top Row: Banner + Friends Sidebar */}
+            <div className="profile-top-row">
+                <div className="profile-main-column">
+                    <div className="profile-banner" style={{ backgroundImage: `url(${bannerUrl})` }}>
+                        <img className="profile-banner-avatar" src={profilePic} alt={profileData.username || 'User Avatar'} />
+                    </div>
+                    {/* Profile Info (centered below avatar) */}
+                    <div className="profile-info">
+                        <div className="profile-banner-username">
+                            {profileData.username || 'Username'} <span className="profile-banner-verified">✔️</span>
+                        </div>
+                        <div className="profile-banner-handle">@{profileData.username?.toLowerCase() || 'username'}</div>
+                        <div className="profile-banner-stats">
+                            <span><strong>{profileData.followersCount || 0}</strong> followers</span>
+                            <span><strong>{profileData.followingCount || 0}</strong> following</span>
+                        </div>
+                        <button className="profile-info-settings-btn" onClick={openEditModal} title="Edit profile settings">
+                            Edit Profile
+                        </button>
+                    </div>
+                    {/* Stats Cards */}
+                    <div className="profile-stats-cards-row">
+                        {stats.map((stat, i) => (
+                            <div className="profile-stats-card" key={i}>
+                                <div className="profile-stats-card-value">{stat.value}</div>
+                                <div className="profile-stats-card-label">{stat.label}</div>
+                                <div className="profile-stats-card-sub">{stat.sub}</div>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Favorite Shows */}
+                    <div className="profile-section">
+                        <h3>Favorite Shows</h3>
+                        <div className="profile-favorites-grid">
+                            {favoriteShows.map((show) => (
+                                <div className="profile-favorite-card" key={show.showId}>
+                                    <img src={show.poster} alt={show.title} />
+                                    <div className="profile-favorite-title">{show.title}</div>
+                                    {show.genre || show.rating ? (
+                                        <div className="profile-favorite-meta">
+                                            {show.genre && <span>{show.genre}</span>}
+                                            {show.genre && show.rating ? ' · ' : ''}
+                                            {show.rating && <span>{show.rating}</span>}
+                                        </div>
+                                    ) : null}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
                 <aside className="profile-friends-sidebar">
                     <h4>Friends</h4>
@@ -253,49 +298,6 @@ const Profile = () => {
                         )}
                     </ul>
                 </aside>
-            </div>
-            {/* Profile Info (centered below avatar) */}
-            <div className="profile-info">
-                <div className="profile-banner-username">
-                    {profileData.username || 'Username'} <span className="profile-banner-verified">✔️</span>
-                </div>
-                <div className="profile-banner-handle">@{profileData.username?.toLowerCase() || 'username'}</div>
-                <div className="profile-banner-stats">
-                    <span><strong>{profileData.followersCount || 0}</strong> followers</span>
-                    <span><strong>{profileData.followingCount || 0}</strong> following</span>
-                </div>
-                <button className="profile-info-settings-btn" onClick={openEditModal} title="Edit profile settings">
-                    Edit Profile
-                </button>
-            </div>
-            {/* Stats Cards */}
-            <div className="profile-stats-cards-row">
-                {stats.map((stat, i) => (
-                    <div className="profile-stats-card" key={i}>
-                        <div className="profile-stats-card-value">{stat.value}</div>
-                        <div className="profile-stats-card-label">{stat.label}</div>
-                        <div className="profile-stats-card-sub">{stat.sub}</div>
-                    </div>
-                ))}
-            </div>
-            {/* Favorite Shows */}
-            <div className="profile-section">
-                <h3>Favorite Shows</h3>
-                <div className="profile-favorites-grid">
-                    {favoriteShows.map((show) => (
-                        <div className="profile-favorite-card" key={show.showId}>
-                            <img src={show.poster} alt={show.title} />
-                            <div className="profile-favorite-title">{show.title}</div>
-                            {show.genre || show.rating ? (
-                                <div className="profile-favorite-meta">
-                                    {show.genre && <span>{show.genre}</span>}
-                                    {show.genre && show.rating ? ' · ' : ''}
-                                    {show.rating && <span>{show.rating}</span>}
-                                </div>
-                            ) : null}
-                        </div>
-                    ))}
-                </div>
             </div>
             {/* Edit Modal */}
             {isEditModalOpen && (
